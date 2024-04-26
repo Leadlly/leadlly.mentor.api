@@ -2,12 +2,9 @@ import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 const userModel = new Schema({
-  firstName: {
+  name: {
     type: String,
     required: [true, "Please enter the first name"],
-  },
-  lastName: {
-    type: String,
   },
   email: {
     type: String,
@@ -17,7 +14,6 @@ const userModel = new Schema({
   phone: {
     personal: {
       type: Number,
-      required: true,
       unique: true,
     },
     other: Number,
@@ -46,6 +42,14 @@ const userModel = new Schema({
     type: String,
     default: "mentor",
   },
+  status: {
+    type: String,
+    enum: ["Verified, Not Verified"],
+    default: "Not Verified"
+  },
+  students: [{
+    type: mongoose.Schema.Types.ObjectId
+  }],
   createdAt: {
     type: Date,
     default: Date.now
