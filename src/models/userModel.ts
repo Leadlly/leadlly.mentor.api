@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-const userModel = new Schema({
+const mentorSchema = new Schema({
   name: {
     type: String,
     required: [true, "Please enter the first name"],
@@ -58,7 +58,7 @@ const userModel = new Schema({
 
 
 // Pre-save hook for email validation
-userModel.pre('save', function (next) {
+mentorSchema.pre('save', function (next) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(this.email)) {
     return next(new Error("Please enter a valid email address"));
@@ -67,7 +67,7 @@ userModel.pre('save', function (next) {
 });
 
 // Pre-save hook for password hashing
-userModel.pre('save', async function (next) {
+mentorSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
   const salt = await bcrypt.genSalt(10);
@@ -76,6 +76,6 @@ userModel.pre('save', async function (next) {
   next();
 });
 
-const User = mongoose.model('User', userModel);
+const Mentor = mongoose.model('Mentor', mentorSchema);
 
-export default User;
+export default Mentor;
