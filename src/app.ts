@@ -4,8 +4,7 @@ import serverless from 'serverless-http';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import errorMiddleware from './middlewares/error';
-import userRoutes from './routes/user'
-import plannerRoutes from './routes/planner'
+import authRoutes from './routes/auth'
 import googleRoutes from './routes/googleAuth'
 import { io as socketIoClient } from 'socket.io-client';
 import Redis from 'ioredis';
@@ -33,9 +32,8 @@ app.use(express.json())
 app.use(urlencoded({extended: true}))
 app.use(cors())
 
-//User routes
-app.use('/api/user', userRoutes)
-app.use('/api/planner', plannerRoutes)
+//routes
+app.use('/api/auth', authRoutes)
 app.use("/api/google", googleRoutes);
 
 app.get('/', (req, res) => {

@@ -1,9 +1,12 @@
-import { Queue, Worker } from 'bullmq';
-import { Redis } from 'ioredis';
+import { Queue } from "bullmq";
+import { Redis } from "ioredis";
+import { config } from "dotenv";
+config();
 
-const connection = new Redis()
+const redisUri = process.env.REDIS_URI as string;
 
+
+const connection = new Redis(redisUri);
 // Reuse the ioredis instance
-export const myQueue = new Queue('myqueue', { connection });
-
+export const otpQueue = new Queue("otp-queue", { connection: connection });
 
