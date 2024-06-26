@@ -1,6 +1,7 @@
 import { Worker } from 'bullmq'
-import redis from '../redis';
+import Redis from "ioredis";
 
+const connection = new Redis({ maxRetriesPerRequest: null });
 export const myWorker = new Worker('myqueue', async (job) => {
     // await sendMail(job, next)
-}, { connection: redis });
+}, { connection });

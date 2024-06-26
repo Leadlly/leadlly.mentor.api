@@ -1,8 +1,9 @@
 import { Queue, Worker } from 'bullmq';
-import redis from '../redis';
+import { Redis } from 'ioredis';
 
+const connection = new Redis()
 
 // Reuse the ioredis instance
-export const myQueue = new Queue('myqueue', { connection: redis });
+export const myQueue = new Queue('myqueue', { connection });
 
 

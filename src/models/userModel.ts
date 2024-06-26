@@ -2,9 +2,12 @@ import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 const mentorSchema = new Schema({
-  name: {
+  firstname: {
     type: String,
     required: [true, "Please enter the first name"],
+  },
+  lastname: {
+    type: String,
   },
   email: {
     type: String,
@@ -14,7 +17,6 @@ const mentorSchema = new Schema({
   phone: {
     personal: {
       type: Number,
-      unique: true,
     },
     other: Number,
   },
@@ -76,6 +78,6 @@ mentorSchema.pre('save', async function (next) {
   next();
 });
 
-const Mentor = mongoose.model('Mentor', mentorSchema);
+const User = mongoose.model('Mentor', mentorSchema);
 
-export default Mentor;
+export default User;
