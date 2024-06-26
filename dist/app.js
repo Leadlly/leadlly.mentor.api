@@ -35,22 +35,11 @@ const cors_1 = __importDefault(require("cors"));
 const error_1 = __importDefault(require("./middlewares/error"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const googleAuth_1 = __importDefault(require("./routes/googleAuth"));
-const socket_io_client_1 = require("socket.io-client");
-const ioredis_1 = __importDefault(require("ioredis"));
 (0, dotenv_1.config)({
     path: './.env'
 });
 const app = (0, express_1.default)();
 exports.app = app;
-const redis = new ioredis_1.default();
-const redisPublisher = new ioredis_1.default();
-const chatSocket = (0, socket_io_client_1.io)('http://localhost:8080');
-chatSocket.on('connect', () => {
-    console.log('Connected to chat server');
-});
-chatSocket.on('receiveMessage', (message) => {
-    console.log('New message:', message);
-});
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
 app.use((0, express_1.urlencoded)({ extended: true }));
@@ -60,11 +49,6 @@ app.use('/api/auth', auth_1.default);
 app.use("/api/google", googleAuth_1.default);
 app.get('/', (req, res) => {
     res.send('Hello, world!');
-});
-app.post('/send-message', (req, res) => {
-    const { message } = req.body;
-    redisPublisher.publish('chat-messages', message);
-    res.send({ status: 'Message sent' });
 });
 app.use(error_1.default);
 // Wrapping express app with serverless-http
