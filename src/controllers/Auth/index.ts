@@ -32,6 +32,7 @@ export const register = async (
     newUser = new User({
       firstname: nameArray[0],
       lastname: nameArray.length > 1 ? nameArray[1] : null,
+      email,
       password,
     });
 
