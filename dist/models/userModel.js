@@ -50,7 +50,6 @@ const mentorSchema = new mongoose_1.Schema({
     },
     password: {
         type: String,
-        required: true,
         select: false,
     },
     avatar: {
@@ -70,7 +69,7 @@ const mentorSchema = new mongoose_1.Schema({
     },
     status: {
         type: String,
-        enum: ["Verified, Not Verified"],
+        enum: ["Verified", "Not Verified"],
         default: "Not Verified"
     },
     students: [{

@@ -5,8 +5,8 @@ import setCookie from "../../utils/setCookie";
 import generateOTP from "../../utils/generateOTP";
 import { otpQueue } from "../../services/bullmq/producer";
 import crypto from "crypto";
+import { db } from "../../db/db";
 
-let OTP: string, newUser: any;
 export const register = async (
   req: Request,
   res: Response,
@@ -18,28 +18,55 @@ export const register = async (
     const user = await User.findOne({ email });
     if (user) return next(new CustomError("User already exists", 400));
 
-    OTP = generateOTP();
+    const OTP = generateOTP();
 
     await otpQueue.add("otpVerify", {
       options: {
         email,
         subject: "Verification",
-        message: `You verification otp for registration is ${OTP}`,
+        message: `Your verification OTP for registration is ${OTP}`,
       },
     });
 
     const nameArray = name.split(" ");
-    newUser = new User({
+    const newUser = {
       firstname: nameArray[0],
-      lastname: nameArray.length > 1 ? nameArray[1] : null,
+      lastname: nameArray.length > 1 ? nameArray.slice(1).join(' ') : null,
       email,
       password,
-    });
+    };
 
-    res.status(200).json({
-      success: true,
-      message: `Verfication OTP send to ${email}`,
-    });
+    // Save OTP and newUser data in the OTP collection
+    const hashedOTP = crypto.createHash('sha256').update(OTP).digest('hex');
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    const existingOtpRecord = await db.collection("otps").findOne({ email });
+    if (existingOtpRecord) {
+      await db.collection("otps").updateOne(
+        { email },
+        {
+          $set: {
+            otp: hashedOTP,
+            expiresAt,
+            newUser,
+          },
+        }
+      );
+    } else {
+      await db.collection("otps").insertOne({
+        email,
+        otp: hashedOTP,
+        expiresAt,
+        newUser,
+      });
+    }
+
+    res.status(200)
+      .cookie('email', email)
+      .json({
+        success: true,
+        message: `Verification OTP sent to ${email}`,
+      });
   } catch (error: any) {
     console.log(error);
     next(new CustomError(error.message));
@@ -51,21 +78,39 @@ export const resentOtp = async (
   res: Response,
   next: NextFunction,
 ) => {
+  console.log("inside resent otp")
   try {
-    OTP = "";
-    OTP = generateOTP();
+    const { email } = req.body;
+    console.log(email)
+
+    const otpRecord = await db.collection("otps").findOne({ email });
+    if (!otpRecord) return next(new CustomError("User not found", 404));
+
+    const OTP = generateOTP();
 
     await otpQueue.add("otpVerify", {
       options: {
-        email: newUser.email,
+        email,
         subject: "Verification",
-        message: `You verification otp for registration is ${OTP}`,
+        message: `Your verification OTP for registration is ${OTP}`,
       },
     });
 
+    const hashedOTP = crypto.createHash('sha256').update(OTP).digest('hex');
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); 
+    await db.collection("otps").updateOne(
+      { email },
+      {
+        $set: {
+          otp: hashedOTP,
+          expiresAt,
+        },
+      }
+    );
+
     res.status(200).json({
       success: true,
-      message: `Otp resend success on ${newUser.email}`,
+      message: `OTP resent successfully to ${email}`,
     });
   } catch (error: any) {
     console.log(error);
@@ -79,16 +124,25 @@ export const otpVerification = async (
   next: NextFunction,
 ) => {
   try {
-    const { otp } = req.body;
+    const { otp, email } = req.body;
 
-    if (otp !== OTP) return next(new CustomError("Wrong Otp", 400));
+    const otpRecord = await db.collection("otps").findOne({ email });
+    if (!otpRecord) return next(new CustomError("OTP not found", 404));
 
-    await newUser.save();
+    const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+    if (hashedOtp !== otpRecord.otp || otpRecord.expiresAt < new Date(Date.now())) {
+      return next(new CustomError("Invalid or expired OTP", 400));
+    }
+
+    const newUser = otpRecord.newUser;
+    const user = await User.create(newUser);
+    await db.collection("otps").deleteOne({ email });
+
     setCookie({
-      user: newUser,
+      user,
       res,
       next,
-      message: "Verification Sucess",
+      message: "Verification Success",
       statusCode: 200,
     });
   } catch (error: any) {
@@ -108,7 +162,6 @@ export const login = async (
     const user = await User.findOne({ email }).select("+password");
     if (!user) return next(new CustomError("Email not registered", 404));
 
-    // Use the comparePassword method here
     const isMatched = await user.comparePassword(password);
     if (!isMatched) return next(new CustomError("Wrong password", 400));
 
@@ -207,23 +260,22 @@ export const logout = async (req: Request, res: Response) => {
     });
 };
 
-export const getUser = async( 
+export const getUser = async(
   req: Request,
   res: Response,
-  next: NextFunction) => {
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user)
+      return next(new CustomError("User not found", 400));
 
-    try {
-      const user = await User.findById(req.user._id)
-      if (!user)
-        return next(new CustomError("User not found", 400));
+    res.status(200).json({
+      success: true,
+      user
+    });
 
-      res.status(200).json({
-        success: true,
-        user
-      });
-
-    } catch (error: any) {
-      next(new CustomError(error.message));
-    }
-  
-}
+  } catch (error: any) {
+    next(new CustomError(error.message));
+  }
+};

@@ -24,7 +24,6 @@ const mentorSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
     select: false,
   },
   avatar: {
@@ -44,7 +43,7 @@ const mentorSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["Verified, Not Verified"],
+    enum: ["Verified", "Not Verified"],
     default: "Not Verified"
   },
   students: [{
