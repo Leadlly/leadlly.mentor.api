@@ -27,8 +27,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
+const util_1 = require("util");
+const pbkdf2Async = (0, util_1.promisify)(crypto_1.default.pbkdf2);
 const mentorSchema = new mongoose_1.Schema({
     firstname: {
         type: String,
@@ -51,6 +52,9 @@ const mentorSchema = new mongoose_1.Schema({
     password: {
         type: String,
         select: false,
+    },
+    salt: {
+        type: String,
     },
     avatar: {
         public_id: {
@@ -91,22 +95,30 @@ mentorSchema.pre("save", function (next) {
     next();
 });
 // Pre-save hook for password hashing
-mentorSchema.pre("save", async function (next) {
-    if (!this.isModified("password"))
-        return next();
-    const salt = await bcrypt_1.default.genSalt(10);
-    if (!this.password)
-        return;
-    this.password = await bcrypt_1.default.hash(this.password, salt);
-    next();
-});
+// mentorSchema.pre<IUser>("save", async function (next) {
+//   if (!this.isModified("password")) return next();
+//     const salt = crypto.randomBytes(16).toString("hex");
+//     this.salt = salt;
+//     const derivedKey = await pbkdf2Async(
+//       this.password,
+//       salt,
+//       1000,
+//       64,
+//       "sha512",
+//     );
+//     this.password = derivedKey.toString("hex");
+//     next();
+// });
 mentorSchema.methods.comparePassword = async function (candidatePassword) {
-    try {
-        return await bcrypt_1.default.compare(candidatePassword, this.password);
-    }
-    catch (error) {
-        throw new Error("Error comparing password.");
-    }
+    console.log(candidatePassword);
+    const hashedPassword = await new Promise((resolve, reject) => {
+        crypto_1.default.pbkdf2(candidatePassword, this.salt, 1000, 64, "sha512", (err, derivedKey) => {
+            if (err)
+                reject(err);
+            resolve(derivedKey.toString("hex"));
+        });
+    });
+    return hashedPassword === this.password;
 };
 mentorSchema.methods.getToken = async function () {
     const resetToken = crypto_1.default.randomBytes(20).toString("hex");

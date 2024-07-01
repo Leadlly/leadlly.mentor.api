@@ -25,34 +25,38 @@ const register = async (req, res, next) => {
                 message: `Your verification OTP for registration is ${OTP}`,
             },
         });
-        const nameArray = name.split(" ");
-        const newUser = {
-            firstname: nameArray[0],
-            lastname: nameArray.length > 1 ? nameArray.slice(1).join(' ') : null,
-            email,
-            password,
-        };
-        // Save OTP and newUser data in the OTP collection
-        const hashedOTP = crypto_1.default.createHash('sha256').update(OTP).digest('hex');
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-        const existingOtpRecord = await db_1.db.collection("otps").findOne({ email });
-        if (existingOtpRecord) {
-            await db_1.db.collection("otps").updateOne({ email }, {
-                $set: {
+        const salt = crypto_1.default.randomBytes(16).toString("hex");
+        crypto_1.default.pbkdf2(password, salt, 1000, 64, "sha512", async (err, derivedKey) => {
+            const nameArray = name.split(" ");
+            const newUser = {
+                firstname: nameArray[0],
+                lastname: nameArray.length > 1 ? nameArray.slice(1).join(' ') : null,
+                email,
+                password: derivedKey.toString("hex"),
+                salt
+            };
+            // Save OTP and newUser data in the OTP collection
+            const hashedOTP = crypto_1.default.createHash('sha256').update(OTP).digest('hex');
+            const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+            const existingOtpRecord = await db_1.db.collection("otps").findOne({ email });
+            if (existingOtpRecord) {
+                await db_1.db.collection("otps").updateOne({ email }, {
+                    $set: {
+                        otp: hashedOTP,
+                        expiresAt,
+                        newUser,
+                    },
+                });
+            }
+            else {
+                await db_1.db.collection("otps").insertOne({
+                    email,
                     otp: hashedOTP,
                     expiresAt,
                     newUser,
-                },
-            });
-        }
-        else {
-            await db_1.db.collection("otps").insertOne({
-                email,
-                otp: hashedOTP,
-                expiresAt,
-                newUser,
-            });
-        }
+                });
+            }
+        });
         res.status(200)
             .cookie('email', email)
             .json({

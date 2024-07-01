@@ -27,14 +27,23 @@ export const register = async (
         message: `Your verification OTP for registration is ${OTP}`,
       },
     });
-
+    const salt = crypto.randomBytes(16).toString("hex");
+    crypto.pbkdf2(
+      password,
+      salt,
+      1000,
+      64,
+      "sha512",
+      async (err, derivedKey) => {
     const nameArray = name.split(" ");
     const newUser = {
       firstname: nameArray[0],
       lastname: nameArray.length > 1 ? nameArray.slice(1).join(' ') : null,
       email,
-      password,
+      password: derivedKey.toString("hex"),
+      salt
     };
+
 
     // Save OTP and newUser data in the OTP collection
     const hashedOTP = crypto.createHash('sha256').update(OTP).digest('hex');
@@ -60,7 +69,7 @@ export const register = async (
         newUser,
       });
     }
-
+  })
     res.status(200)
       .cookie('email', email)
       .json({

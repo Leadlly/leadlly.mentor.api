@@ -1,7 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
-import bcrypt from 'bcrypt';
-import crypto from 'crypto'
 import IUser from '../types/IUser';
+import crypto from "crypto";
+import { promisify } from "util";
+
+const pbkdf2Async = promisify(crypto.pbkdf2);
 
 const mentorSchema = new Schema({
   firstname: {
@@ -25,6 +27,9 @@ const mentorSchema = new Schema({
   password: {
     type: String,
     select: false,
+  },
+  salt: {
+    type: String,
   },
   avatar: {
     public_id: {
@@ -69,24 +74,42 @@ mentorSchema.pre("save", function (next) {
 });
 
 // Pre-save hook for password hashing
-mentorSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+// mentorSchema.pre<IUser>("save", async function (next) {
+//   if (!this.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(10);
-  if (!this.password) return;
-  this.password = await bcrypt.hash(this.password, salt);
+//     const salt = crypto.randomBytes(16).toString("hex");
+//     this.salt = salt;
 
-  next();
-});
+//     const derivedKey = await pbkdf2Async(
+//       this.password,
+//       salt,
+//       1000,
+//       64,
+//       "sha512",
+//     );
+//     this.password = derivedKey.toString("hex");
+
+//     next();
+// });
 
 mentorSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
-  try {
-    return await bcrypt.compare(candidatePassword, this.password);
-  } catch (error) {
-    throw new Error("Error comparing password.");
-  }
+    const hashedPassword = await new Promise((resolve, reject) => {
+      crypto.pbkdf2(
+        candidatePassword,
+        this.salt,
+        1000,
+        64,
+        "sha512",
+        (err, derivedKey) => {
+          if (err) reject(err);
+          resolve(derivedKey.toString("hex"));
+        },
+      );
+    });
+
+    return hashedPassword === this.password;
 };
 
 mentorSchema.methods.getToken = async function (): Promise<string> {

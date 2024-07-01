@@ -9,6 +9,7 @@ interface IUser extends Document {
     other?: number;
   };
   password: string;
+  salt: string;
   avatar?: {
     public_id: string;
     url: string;
