@@ -24,6 +24,7 @@ interface IUser extends Document {
   createdAt?: Date; 
   resetPasswordToken?: string | null;
   resetTokenExpiry?: string | null;
+  tag: "JEE" | "NEET" ;
   comparePassword(candidatePassword: string): Promise<boolean>;
   getToken(): Promise<string>;
 }
