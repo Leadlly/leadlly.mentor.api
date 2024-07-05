@@ -58,7 +58,11 @@ const register = async (req, res, next) => {
             }
         });
         res.status(200)
-            .cookie('email', email)
+            .cookie('email', email, {
+            httpOnly: true,
+            sameSite: "none",
+            secure: true
+        })
             .json({
             success: true,
             message: `Verification OTP sent to ${email}`,

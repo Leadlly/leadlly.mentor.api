@@ -1,7 +1,7 @@
 import { app } from "./app";
 import ConnectToDB, { questions_db } from "./db/db";
 import { otpWorker } from "./services/bullmq/worker";
-import { connectToRedis } from "./services/redis";
+import { oauth2Client } from "./services/Google/getOauth";
 
 const port = process.env.PORT || 4001
 

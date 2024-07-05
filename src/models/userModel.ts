@@ -1,17 +1,18 @@
 import mongoose, { Schema } from 'mongoose';
+import crypto from 'crypto';
+import { promisify } from 'util';
 import IUser from '../types/IUser';
-import crypto from "crypto";
-import { promisify } from "util";
 
 const pbkdf2Async = promisify(crypto.pbkdf2);
 
 const mentorSchema = new Schema({
   firstname: {
     type: String,
-    required: [true, "Please enter the first name"],
+    required: [true, 'Please enter the first name'],
   },
   lastname: {
     type: String,
+    default: '',
   },
   email: {
     type: String,
@@ -21,15 +22,21 @@ const mentorSchema = new Schema({
   phone: {
     personal: {
       type: Number,
+      default: null,
     },
-    other: Number,
+    other: {
+      type: Number,
+      default: null,
+    },
   },
   password: {
     type: String,
     select: false,
+    default: null,
   },
   salt: {
     type: String,
+    default: null,
   },
   avatar: {
     public_id: {
@@ -42,14 +49,30 @@ const mentorSchema = new Schema({
     },
   },
   about: {
-    college: String,
-    degree: String,
-    dob: String,
+    college: {
+      type: String,
+      default: '',
+    },
+    degree: {
+      type: String,
+      default: '',
+    },
+    dob: {
+      type: String,
+      default: '',
+    },
   },
   status: {
     type: String,
-    enum: ["Verified", "Not Verified"],
-    default: "Not Verified"
+    enum: ['Verified', 'Not Verified'],
+    default: 'Not Verified',
+  },
+  gmeet: {
+    tokens: {},
+    link: {
+      type: String,
+      default: null,
+    },
   },
   students: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -58,74 +81,76 @@ const mentorSchema = new Schema({
   }],
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
-  resetPasswordToken: { type: String, default: null },
-  resetTokenExpiry: { type: String, default: null },
-
+  resetPasswordToken: {
+    type: String,
+    default: null,
+  },
+  resetTokenExpiry: {
+    type: Date,
+    default: null,
+  },
 });
 
-
-// Pre-save hook for email validation
-mentorSchema.pre("save", function (next) {
+mentorSchema.pre('save', function (next) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(this.email)) {
-    return next(new Error("Please enter a valid email address"));
+    return next(new Error('Please enter a valid email address'));
   }
   next();
 });
 
-// Pre-save hook for password hashing
-// mentorSchema.pre<IUser>("save", async function (next) {
-//   if (!this.isModified("password")) return next();
+mentorSchema.pre<IUser>('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
-//     const salt = crypto.randomBytes(16).toString("hex");
-//     this.salt = salt;
+  const salt = crypto.randomBytes(16).toString('hex');
+  this.salt = salt;
 
-//     const derivedKey = await pbkdf2Async(
-//       this.password,
-//       salt,
-//       1000,
-//       64,
-//       "sha512",
-//     );
-//     this.password = derivedKey.toString("hex");
+  const derivedKey = await pbkdf2Async(
+    this.password,
+    salt,
+    1000,
+    64,
+    'sha512'
+  );
+  this.password = derivedKey.toString('hex');
 
-//     next();
-// });
+  next();
+});
 
 mentorSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
-    const hashedPassword = await new Promise((resolve, reject) => {
-      crypto.pbkdf2(
-        candidatePassword,
-        this.salt,
-        1000,
-        64,
-        "sha512",
-        (err, derivedKey) => {
-          if (err) reject(err);
-          resolve(derivedKey.toString("hex"));
-        },
-      );
-    });
+  const hashedPassword = await new Promise((resolve, reject) => {
+    crypto.pbkdf2(
+      candidatePassword,
+      this.salt,
+      1000,
+      64,
+      'sha512',
+      (err, derivedKey) => {
+        if (err) reject(err);
+        resolve(derivedKey.toString('hex'));
+      }
+    );
+  });
 
-    return hashedPassword === this.password;
+  return hashedPassword === this.password;
 };
 
 mentorSchema.methods.getToken = async function (): Promise<string> {
-  const resetToken = crypto.randomBytes(20).toString("hex");
+  const resetToken = crypto.randomBytes(20).toString('hex');
 
   this.resetPasswordToken = crypto
-    .createHash("sha256")
+    .createHash('sha256')
     .update(resetToken)
-    .digest("hex");
-  this.resetTokenExpiry = Date.now() + 10 * 60 * 1000;
+    .digest('hex');
+  this.resetTokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
 
   return resetToken;
 };
 
-const User = mongoose.model<IUser>('Mentor', mentorSchema);
+const Mentor = mongoose.model<IUser>('Mentor', mentorSchema);
 
-export default User;
+export default Mentor;
