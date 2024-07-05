@@ -1,38 +1,44 @@
-import Mentor from "../../models/userModel";
-//import Student from  "../models/userModel"
+import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import Mentor from '../../models/userModel';
 
+const Student = mongoose.connection.collection('students');
 
-export const allocateStudents = async () => {
-    try {
-        const unallocatedStudents = await Student.find({mentorId: {$exists: false}});
+export const allocateStudent = async (req: Request, res: Response) => {
+  try {
+    const studentId = req.params.studentId;
+    const student = await Student.findOne({ _id: new mongoose.Types.ObjectId(studentId) });
 
-        const mentors = await Mentor.find();
-
-        const mentorStudentCount: {[key:string]: number} ={};
-        mentors.forEach((mentor) => {
-            mentorStudentCount[mentor._id.toString()] = mentor.students.length;
-        });
-
-        for (const student of unallocatedStudents){
-            const {tag} = student;
-
-            const availableMentor = mentors.find((mentor) => mentor.tag === tag && mentorStudentCount[mentor._id.toString()] < 30);
-            if (availableMentor) {
-                student.mentorId = availableMentor._id;
-                await student.save();
-
-
-                availableMentor.students.push(student._id);
-                await availableMentor.save();
-
-                mentorStudentCount[availableMentor._id.toString()] +=1;
-            } else {
-                console.log(`No available mentor for student ${student._id} tag ${tag}`)
-            }
-        }
-
-        console.log('Student allocation completed successfully.');
-    } catch (error) {
-        console.log('Error allocating students to mentors:', error);
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
     }
+
+    if (student.mentorId) {
+      return res.status(400).json({ message: 'Student has a mentor' });
+    }
+
+    const availableMentor = await Mentor.findOne({
+      tag: student.tag,
+      $expr: { $lt: [{ $size: { $ifNull: ['$students', []] } }, 30] },
+    });
+
+    if (!availableMentor) {
+      return res.status(404).json({ message: 'No available mentors found' });
+    }
+
+    availableMentor.students = availableMentor.students || [];
+    availableMentor.students.push(student._id);
+
+    await availableMentor.save();
+
+    await Student.updateOne(
+      { _id: student._id },
+      { $set: { mentorId: availableMentor._id } }
+    );
+
+    res.status(200).json({ message: 'Student allocated to mentor successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };

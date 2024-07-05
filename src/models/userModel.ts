@@ -52,7 +52,9 @@ const mentorSchema = new Schema({
     default: "Not Verified"
   },
   students: [{
-    type: mongoose.Schema.Types.ObjectId
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student', 
+    default: []
   }],
   createdAt: {
     type: Date,
