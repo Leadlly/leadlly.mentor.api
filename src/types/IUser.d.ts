@@ -1,31 +1,42 @@
-import { Document } from "mongoose";
+import mongoose from 'mongoose';
 
-interface IUser extends Document {
+interface IAvatar {
+  public_id: string;
+  url: string;
+}
+
+interface IAbout {
+  college: string;
+  degree: string;
+  dob: string;
+}
+
+interface IGMeet {
+  tokens: {};
+  link: string | null;
+}
+
+interface IUser extends mongoose.Document {
   firstname: string;
   lastname?: string;
   email: string;
-  phone?: {
+  phone: {
     personal?: number;
     other?: number;
   };
-  password: string;
-  salt: string;
-  avatar?: {
-    public_id: string;
-    url: string;
-  };
-  about?: {
-    college?: string;
-    degree?: string;
-    dob?: string; 
-  };
-  status: "Verified" | "Not Verified";
-  students?: mongoose.Schema.Types.ObjectId[];
-  createdAt?: Date; 
+  password?: string;
+  salt?: string;
+  avatar: IAvatar;
+  about: IAbout;
+  status: 'Verified' | 'Not Verified';
+  gmeet: IGMeet;
+  students: mongoose.Types.ObjectId[];
+  createdAt: Date;
   resetPasswordToken?: string | null;
-  resetTokenExpiry?: string | null;
+  resetTokenExpiry?: Date | null;
+
   comparePassword(candidatePassword: string): Promise<boolean>;
   getToken(): Promise<string>;
 }
 
-export default IUser;
+export default IMentor;

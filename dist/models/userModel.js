@@ -33,10 +33,11 @@ const pbkdf2Async = (0, util_1.promisify)(crypto_1.default.pbkdf2);
 const mentorSchema = new mongoose_1.Schema({
     firstname: {
         type: String,
-        required: [true, "Please enter the first name"],
+        required: [true, 'Please enter the first name'],
     },
     lastname: {
         type: String,
+        default: '',
     },
     email: {
         type: String,
@@ -46,15 +47,21 @@ const mentorSchema = new mongoose_1.Schema({
     phone: {
         personal: {
             type: Number,
+            default: null,
         },
-        other: Number,
+        other: {
+            type: Number,
+            default: null,
+        },
     },
     password: {
         type: String,
         select: false,
+        default: null,
     },
     salt: {
         type: String,
+        default: null,
     },
     avatar: {
         public_id: {
@@ -67,67 +74,82 @@ const mentorSchema = new mongoose_1.Schema({
         },
     },
     about: {
-        college: String,
-        degree: String,
-        dob: String,
+        college: {
+            type: String,
+            default: '',
+        },
+        degree: {
+            type: String,
+            default: '',
+        },
+        dob: {
+            type: String,
+            default: '',
+        },
     },
     status: {
         type: String,
-        enum: ["Verified", "Not Verified"],
-        default: "Not Verified"
+        enum: ['Verified', 'Not Verified'],
+        default: 'Not Verified',
+    },
+    gmeet: {
+        tokens: {},
+        link: {
+            type: String,
+            default: null,
+        },
     },
     students: [{
-            type: mongoose_1.default.Schema.Types.ObjectId
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: 'Student',
         }],
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now,
     },
-    resetPasswordToken: { type: String, default: null },
-    resetTokenExpiry: { type: String, default: null },
+    resetPasswordToken: {
+        type: String,
+        default: null,
+    },
+    resetTokenExpiry: {
+        type: Date,
+        default: null,
+    },
 });
-// Pre-save hook for email validation
-mentorSchema.pre("save", function (next) {
+mentorSchema.pre('save', function (next) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.email)) {
-        return next(new Error("Please enter a valid email address"));
+        return next(new Error('Please enter a valid email address'));
     }
     next();
 });
-// Pre-save hook for password hashing
-// mentorSchema.pre<IUser>("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-//     const salt = crypto.randomBytes(16).toString("hex");
-//     this.salt = salt;
-//     const derivedKey = await pbkdf2Async(
-//       this.password,
-//       salt,
-//       1000,
-//       64,
-//       "sha512",
-//     );
-//     this.password = derivedKey.toString("hex");
-//     next();
-// });
+mentorSchema.pre('save', async function (next) {
+    if (!this.isModified('password'))
+        return next();
+    const salt = crypto_1.default.randomBytes(16).toString('hex');
+    this.salt = salt;
+    const derivedKey = await pbkdf2Async(this.password, salt, 1000, 64, 'sha512');
+    this.password = derivedKey.toString('hex');
+    next();
+});
 mentorSchema.methods.comparePassword = async function (candidatePassword) {
-    console.log(candidatePassword);
     const hashedPassword = await new Promise((resolve, reject) => {
-        crypto_1.default.pbkdf2(candidatePassword, this.salt, 1000, 64, "sha512", (err, derivedKey) => {
+        crypto_1.default.pbkdf2(candidatePassword, this.salt, 1000, 64, 'sha512', (err, derivedKey) => {
             if (err)
                 reject(err);
-            resolve(derivedKey.toString("hex"));
+            resolve(derivedKey.toString('hex'));
         });
     });
     return hashedPassword === this.password;
 };
 mentorSchema.methods.getToken = async function () {
-    const resetToken = crypto_1.default.randomBytes(20).toString("hex");
+    const resetToken = crypto_1.default.randomBytes(20).toString('hex');
     this.resetPasswordToken = crypto_1.default
-        .createHash("sha256")
+        .createHash('sha256')
         .update(resetToken)
-        .digest("hex");
-    this.resetTokenExpiry = Date.now() + 10 * 60 * 1000;
+        .digest('hex');
+    this.resetTokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
     return resetToken;
 };
-const User = mongoose_1.default.model('Mentor', mentorSchema);
-exports.default = User;
+const Mentor = mongoose_1.default.model('Mentor', mentorSchema);
+exports.default = Mentor;

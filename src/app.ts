@@ -6,11 +6,13 @@ import cors from 'cors';
 import errorMiddleware from './middlewares/error';
 import authRoutes from './routes/auth'
 import googleRoutes from './routes/googleAuth'
-
+import { createMeetLink } from './helpers/GoogleMeet';
 
 config({
     path: './.env'
 });
+
+// createMeetLink("Hello")
 
 const app = express();
 

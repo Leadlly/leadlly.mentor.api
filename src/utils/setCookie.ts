@@ -28,6 +28,8 @@ const setCookie = async ({ user, res, next, message, statusCode }: Cookie) => {
         .json({
           success: true,
           message,
+          token,
+          user
         });
   
   } catch (error: any) {
