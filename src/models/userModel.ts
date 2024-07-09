@@ -61,6 +61,10 @@ const mentorSchema = new Schema({
       type: String,
       default: '',
     },
+    gender: {
+      type: String,
+      default: ''
+    }
   },
   status: {
     type: String,
@@ -74,10 +78,22 @@ const mentorSchema = new Schema({
       default: null,
     },
   },
+  preference: {
+    standard: Array,
+    competitiveExam: Array
+  },
   students: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Student', 
-    default: []
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: []
+    },
+    gmeet: {
+      tokens: {},
+      link: {
+        type: String,
+        default: null,
+      },
+    }
   }],
   createdAt: {
     type: Date,
@@ -101,23 +117,23 @@ mentorSchema.pre('save', function (next) {
   next();
 });
 
-mentorSchema.pre<IUser>('save', async function (next) {
-  if (!this.isModified('password')) return next();
+// mentorSchema.pre<IUser>('save', async function (next) {
+//   if (!this.isModified('password')) return next();
 
-  const salt = crypto.randomBytes(16).toString('hex');
-  this.salt = salt;
+//   const salt = crypto.randomBytes(16).toString('hex');
+//   this.salt = salt;
 
-  const derivedKey = await pbkdf2Async(
-    this.password,
-    salt,
-    1000,
-    64,
-    'sha512'
-  );
-  this.password = derivedKey.toString('hex');
+//   const derivedKey = await pbkdf2Async(
+//     this.password,
+//     salt,
+//     1000,
+//     64,
+//     'sha512'
+//   );
+//   this.password = derivedKey.toString('hex');
 
-  next();
-});
+//   next();
+// });
 
 mentorSchema.methods.comparePassword = async function (
   candidatePassword: string
@@ -136,6 +152,7 @@ mentorSchema.methods.comparePassword = async function (
     );
   });
 
+  console.log(hashedPassword, "-------->",  this.password)
   return hashedPassword === this.password;
 };
 

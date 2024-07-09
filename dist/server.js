@@ -25,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = require("./app");
 const db_1 = __importStar(require("./db/db"));
+const verifiedMentor_1 = require("./events/verifiedMentor");
 const worker_1 = require("./services/bullmq/worker");
 const port = process.env.PORT || 4001;
 //Database
@@ -34,5 +35,7 @@ const port = process.env.PORT || 4001;
 db_1.questions_db.on("connected", () => {
     console.log("Question_DB connected");
 });
+//event for mentor collection
+(0, verifiedMentor_1.watchMentorCollection)();
 worker_1.otpWorker;
 app_1.app.listen(port, () => console.log(`Server is working on port ${port}`));

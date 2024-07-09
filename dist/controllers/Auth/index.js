@@ -26,6 +26,7 @@ const register = async (req, res, next) => {
             },
         });
         const salt = crypto_1.default.randomBytes(16).toString("hex");
+        console.log(salt);
         crypto_1.default.pbkdf2(password, salt, 1000, 64, "sha512", async (err, derivedKey) => {
             const nameArray = name.split(" ");
             const newUser = {
@@ -142,9 +143,11 @@ const login = async (req, res, next) => {
         const user = await userModel_1.default.findOne({ email }).select("+password");
         if (!user)
             return next(new error_1.CustomError("Email not registered", 404));
+        console.log("here");
         const isMatched = await user.comparePassword(password);
         if (!isMatched)
             return next(new error_1.CustomError("Wrong password", 400));
+        console.log("hi");
         (0, setCookie_1.default)({
             user,
             res,

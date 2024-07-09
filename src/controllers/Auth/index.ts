@@ -28,6 +28,7 @@ export const register = async (
       },
     });
     const salt = crypto.randomBytes(16).toString("hex");
+    console.log(salt)
     crypto.pbkdf2(
       password,
       salt,
@@ -50,6 +51,7 @@ export const register = async (
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     const existingOtpRecord = await db.collection("otps").findOne({ email });
+
     if (existingOtpRecord) {
       await db.collection("otps").updateOne(
         { email },
@@ -175,9 +177,11 @@ export const login = async (
     const user = await User.findOne({ email }).select("+password");
     if (!user) return next(new CustomError("Email not registered", 404));
 
+    console.log("here")
     const isMatched = await user.comparePassword(password);
     if (!isMatched) return next(new CustomError("Wrong password", 400));
 
+    console.log("hi")
     setCookie({
       user,
       res,

@@ -86,6 +86,10 @@ const mentorSchema = new mongoose_1.Schema({
             type: String,
             default: '',
         },
+        gender: {
+            type: String,
+            default: ''
+        }
     },
     status: {
         type: String,
@@ -99,9 +103,22 @@ const mentorSchema = new mongoose_1.Schema({
             default: null,
         },
     },
+    preference: {
+        standard: Array,
+        competitiveExam: Array
+    },
     students: [{
-            type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: 'Student',
+            id: {
+                type: mongoose_1.default.Schema.Types.ObjectId,
+                default: []
+            },
+            gmeet: {
+                tokens: {},
+                link: {
+                    type: String,
+                    default: null,
+                },
+            }
         }],
     createdAt: {
         type: Date,
@@ -123,15 +140,20 @@ mentorSchema.pre('save', function (next) {
     }
     next();
 });
-mentorSchema.pre('save', async function (next) {
-    if (!this.isModified('password'))
-        return next();
-    const salt = crypto_1.default.randomBytes(16).toString('hex');
-    this.salt = salt;
-    const derivedKey = await pbkdf2Async(this.password, salt, 1000, 64, 'sha512');
-    this.password = derivedKey.toString('hex');
-    next();
-});
+// mentorSchema.pre<IUser>('save', async function (next) {
+//   if (!this.isModified('password')) return next();
+//   const salt = crypto.randomBytes(16).toString('hex');
+//   this.salt = salt;
+//   const derivedKey = await pbkdf2Async(
+//     this.password,
+//     salt,
+//     1000,
+//     64,
+//     'sha512'
+//   );
+//   this.password = derivedKey.toString('hex');
+//   next();
+// });
 mentorSchema.methods.comparePassword = async function (candidatePassword) {
     const hashedPassword = await new Promise((resolve, reject) => {
         crypto_1.default.pbkdf2(candidatePassword, this.salt, 1000, 64, 'sha512', (err, derivedKey) => {
@@ -140,6 +162,7 @@ mentorSchema.methods.comparePassword = async function (candidatePassword) {
             resolve(derivedKey.toString('hex'));
         });
     });
+    console.log(hashedPassword, "-------->", this.password);
     return hashedPassword === this.password;
 };
 mentorSchema.methods.getToken = async function () {
