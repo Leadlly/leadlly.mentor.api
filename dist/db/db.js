@@ -8,23 +8,19 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 let db;
+let questions_db;
 const ConnectToDB = async () => {
     const DatabaseUrl = process.env.LEADLLY_DB_URL;
-    // if (!DatabaseUrl) {
-    //   console.log("Leadlly_DB url is undefined");
-    //   return;
-    // }
+    const questionsDbUrl = process.env.LEADLLY_QUESTIONS_DB_URL;
     try {
         await mongoose_1.default.connect(DatabaseUrl);
         exports.db = db = mongoose_1.default.connection;
         console.log("Leadlly_DB Connected.");
+        exports.questions_db = questions_db = await mongoose_1.default.createConnection(questionsDbUrl);
+        console.log("Questions_DB Connected.");
     }
     catch (error) {
-        console.log(error);
+        console.log("Error connecting to databases:", error);
     }
 };
-//question_db_connection
-let questions_db;
-const questions_db_url = process.env.LEADLLY_QUESTIONS_DB_URL;
-exports.questions_db = questions_db = mongoose_1.default.createConnection(questions_db_url);
 exports.default = ConnectToDB;

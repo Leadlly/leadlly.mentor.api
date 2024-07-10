@@ -1,4 +1,3 @@
-import { query } from 'express';
 import { db } from '../../db/db';
 import Mentor from '../../models/userModel';
 
@@ -7,7 +6,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
     const Student = db.collection('users');
     const mentor = await Mentor.findById(mentorId);
 
-    console.log(mentor, "mentor")
+    console.log(mentor, "mentor");
     if (!mentor) {
       console.log('Mentor not found');
       return;
@@ -26,11 +25,10 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     // Create all possible mentor tags
     const mentorTags = [
-      ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, mentor.about.gender),
+      ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, mentor.about.gender || ''),
       ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, '')
     ];
 
-    console.log(mentorTags, "tags are here =======>")
     // Find students with matching tags and no mentor assigned
     const students = await Student.find({
       'mentor.id': null,
@@ -38,7 +36,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
         const match = tag.match(/([a-zA-Z]+)(\d+)([a-zA-Z]*)/);
         if (match) {
           const [exam, standard, gender] = match.slice(1, 4);
-  
+
           const query: any = {
             'academic.competitiveExam': exam,
             'academic.standard': Number(standard),
@@ -46,7 +44,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
           if (gender) {
             query['about.gender'] = gender;
           }
-          console.log(query)
+          console.log(query);
           return { $and: [query] };
         }
 
@@ -54,7 +52,6 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
       }).filter(query => query !== null)
     }).limit(30).toArray();
 
-    console.log("2222222 are here =======>")
 
     if (students.length === 0) {
       console.log('No students found for allocation');
@@ -65,7 +62,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     // Ensure mentor.students is an array and push student IDs
     mentor.students = mentor.students || [];
-    mentor.students.push(...studentIds.map(id => ({ id })));
+    mentor.students.push(...studentIds.map(id => ({ id, gmeet: { tokens: {}, link: null } })));
 
     await mentor.save();
 

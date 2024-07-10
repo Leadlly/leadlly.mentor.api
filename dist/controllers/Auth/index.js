@@ -8,9 +8,9 @@ const userModel_1 = __importDefault(require("../../models/userModel"));
 const error_1 = require("../../middlewares/error");
 const setCookie_1 = __importDefault(require("../../utils/setCookie"));
 const generateOTP_1 = __importDefault(require("../../utils/generateOTP"));
-const producer_1 = require("../../services/bullmq/producer");
 const crypto_1 = __importDefault(require("crypto"));
 const db_1 = require("../../db/db");
+const sendMail_1 = require("../../utils/sendMail");
 const register = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
@@ -18,12 +18,18 @@ const register = async (req, res, next) => {
         if (user)
             return next(new error_1.CustomError("User already exists", 400));
         const OTP = (0, generateOTP_1.default)();
-        await producer_1.otpQueue.add("otpVerify", {
-            options: {
-                email,
-                subject: "Verification",
-                message: `Your verification OTP for registration is ${OTP}`,
-            },
+        // await otpQueue.add("otpVerify", {
+        //   options: {
+        //     email,
+        //     subject: "Verification",
+        //     message: `Your verification OTP for registration is ${OTP}`,
+        //   },
+        // });
+        await (0, sendMail_1.sendMail)({
+            email,
+            subject: "Verification",
+            message: OTP,
+            tag: "otp"
         });
         const salt = crypto_1.default.randomBytes(16).toString("hex");
         console.log(salt);
@@ -84,12 +90,18 @@ const resentOtp = async (req, res, next) => {
         if (!otpRecord)
             return next(new error_1.CustomError("User not found", 404));
         const OTP = (0, generateOTP_1.default)();
-        await producer_1.otpQueue.add("otpVerify", {
-            options: {
-                email,
-                subject: "Verification",
-                message: `Your verification OTP for registration is ${OTP}`,
-            },
+        // await otpQueue.add("otpVerify", {
+        //   options: {
+        //     email,
+        //     subject: "Verification",
+        //     message: `Your verification OTP for registration is ${OTP}`,
+        //   },
+        // });
+        await (0, sendMail_1.sendMail)({
+            email,
+            subject: "Verification",
+            message: OTP,
+            tag: "otp"
         });
         const hashedOTP = crypto_1.default.createHash('sha256').update(OTP).digest('hex');
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
@@ -171,12 +183,18 @@ const forgotPassword = async (req, res, next) => {
         const resetToken = await user.getToken();
         await user.save(); //saving the token in user
         const url = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
-        await producer_1.otpQueue.add("otpVerify", {
-            options: {
-                email: email,
-                subject: "Password Reset",
-                message: `You reset password link is here ${url}`,
-            },
+        // await otpQueue.add("otpVerify", {
+        //   options: {
+        //     email: email,
+        //     subject: "Password Reset",
+        //     message: `You reset password link is here ${url}`,
+        //   },
+        // });
+        await (0, sendMail_1.sendMail)({
+            email,
+            subject: "Password Reset",
+            message: url,
+            tag: 'password_reset'
         });
         res.status(200).json({
             success: true,

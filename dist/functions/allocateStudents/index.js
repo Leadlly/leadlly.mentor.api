@@ -27,10 +27,9 @@ const allocateStudentsToMentor = async (mentorId) => {
         };
         // Create all possible mentor tags
         const mentorTags = [
-            ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, mentor.about.gender),
+            ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, mentor.about.gender || ''),
             ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, '')
         ];
-        console.log(mentorTags, "tags are here =======>");
         // Find students with matching tags and no mentor assigned
         const students = await Student.find({
             'mentor.id': null,
@@ -51,7 +50,6 @@ const allocateStudentsToMentor = async (mentorId) => {
                 return null;
             }).filter(query => query !== null)
         }).limit(30).toArray();
-        console.log("2222222 are here =======>");
         if (students.length === 0) {
             console.log('No students found for allocation');
             return;
@@ -59,7 +57,7 @@ const allocateStudentsToMentor = async (mentorId) => {
         const studentIds = students.map(student => student._id);
         // Ensure mentor.students is an array and push student IDs
         mentor.students = mentor.students || [];
-        mentor.students.push(...studentIds.map(id => ({ id })));
+        mentor.students.push(...studentIds.map(id => ({ id, gmeet: { tokens: {}, link: null } })));
         await mentor.save();
         await Student.updateMany({ _id: { $in: studentIds } }, { $set: { 'mentor.id': mentor._id } });
         console.log('Students allocated to mentor successfully');

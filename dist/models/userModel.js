@@ -33,26 +33,17 @@ const pbkdf2Async = (0, util_1.promisify)(crypto_1.default.pbkdf2);
 const mentorSchema = new mongoose_1.Schema({
     firstname: {
         type: String,
-        required: [true, 'Please enter the first name'],
+        required: [true, "Please enter your name"],
+        default: null,
     },
     lastname: {
         type: String,
-        default: '',
+        default: null,
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
+    email: { type: String, required: true, unique: true, default: null },
     phone: {
-        personal: {
-            type: Number,
-            default: null,
-        },
-        other: {
-            type: Number,
-            default: null,
-        },
+        personal: { type: Number, default: null },
+        other: { type: Number, default: null },
     },
     password: {
         type: String,
@@ -62,6 +53,11 @@ const mentorSchema = new mongoose_1.Schema({
     salt: {
         type: String,
         default: null,
+    },
+    address: {
+        country: { type: String, default: null },
+        addressLine: { type: String, default: null },
+        pincode: { type: Number, default: null },
     },
     avatar: {
         public_id: {
@@ -74,22 +70,13 @@ const mentorSchema = new mongoose_1.Schema({
         },
     },
     about: {
-        college: {
-            type: String,
-            default: '',
-        },
-        degree: {
-            type: String,
-            default: '',
-        },
-        dob: {
-            type: String,
-            default: '',
-        },
-        gender: {
-            type: String,
-            default: ''
-        }
+        dateOfBirth: { type: String, default: null },
+        gender: { type: String, default: null },
+    },
+    academic: {
+        schoolOrCollegeName: { type: String, default: null },
+        schoolOrCollegeAddress: { type: String, default: null },
+        degree: { type: String, default: null },
     },
     status: {
         type: String,
