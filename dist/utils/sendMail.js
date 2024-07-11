@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendMail = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const getMailTemplates_1 = require("./getMailTemplates");
 const sendMail = async (options) => {
     try {
         const transporter = nodemailer_1.default.createTransport({
@@ -21,7 +22,7 @@ const sendMail = async (options) => {
             from: process.env.SMTP_USER,
             to: options.email,
             subject: options.subject,
-            text: options.message,
+            html: (0, getMailTemplates_1.getTemplate)(options),
         };
         await transporter.sendMail(mailOptions);
     }

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isVerified = exports.checkAuth = void 0;
+exports.checkAuth = void 0;
 const error_1 = require("./error");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userModel_1 = __importDefault(require("../models/userModel"));
@@ -19,9 +19,3 @@ const checkAuth = async (req, res, next) => {
     next();
 };
 exports.checkAuth = checkAuth;
-const isVerified = async (req, res, next) => {
-    if (req.user.status !== "Verified")
-        return next(new error_1.CustomError("Your are not verified", 400));
-    next();
-};
-exports.isVerified = isVerified;

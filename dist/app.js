@@ -35,6 +35,7 @@ const cors_1 = __importDefault(require("cors"));
 const error_1 = __importDefault(require("./middlewares/error"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const googleAuth_1 = __importDefault(require("./routes/googleAuth"));
+const user_1 = __importDefault(require("./routes/user"));
 (0, dotenv_1.config)({
     path: './.env'
 });
@@ -52,6 +53,7 @@ app.use((0, cors_1.default)({
 //routes
 app.use('/api/auth', auth_1.default);
 app.use("/api/google", googleAuth_1.default);
+app.use("/api/user", user_1.default);
 app.get('/', (req, res) => {
     res.send('Hello, world!');
 });
