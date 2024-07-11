@@ -7,7 +7,8 @@ import errorMiddleware from './middlewares/error';
 import authRoutes from './routes/auth'
 import googleRoutes from './routes/googleAuth'
 import userRoutes from './routes/user'
-import { createMeetLink } from './helpers/GoogleMeet';
+import meetingRoutes from './routes/meeting'
+
 
 config({
     path: './.env'
@@ -33,6 +34,7 @@ app.use(
 app.use('/api/auth', authRoutes)
 app.use("/api/google", googleRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/meeting", meetingRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello, world!');
