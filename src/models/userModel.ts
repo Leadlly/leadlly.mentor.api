@@ -73,6 +73,7 @@ const mentorSchema = new Schema({
   students: [{
     id: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       default: []
     },
     gmeet: {

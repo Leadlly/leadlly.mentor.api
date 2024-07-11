@@ -43,6 +43,7 @@ export const mentorOauthCallback = async (req: Request, res: Response, next: Nex
 export const mentorlInfo = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const bodyData = req.body;
+    console.log(req.user._id)
     const user = (await User.findById(req.user._id)) as IUser;
 
     if (!user) {
