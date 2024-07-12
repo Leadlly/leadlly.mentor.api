@@ -7,6 +7,7 @@ import { otpQueue } from "../../services/bullmq/producer";
 import crypto from "crypto";
 import { db } from "../../db/db";
 import { sendMail } from "../../utils/sendMail";
+import IUser from "../../types/IUser";
 
 export const register = async (
   req: Request,
@@ -322,5 +323,74 @@ export const getUser = async(
 
   } catch (error: any) {
     next(new CustomError(error.message));
+  }
+};
+
+export const mentorlInfo = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const bodyData = req.body;
+    const user = (await User.findById(req.user._id)) as IUser;
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (bodyData.firstName) {
+      user.firstname = bodyData.firstName;
+    }
+
+    if (bodyData.lastName) {
+      user.lastname = bodyData.lastName;
+    }
+
+    if (bodyData.dateOfBirth) {
+      user.about.dateOfBirth = bodyData.dateOfBirth;
+    }
+
+    if (bodyData.phone) {
+      user.phone.personal = bodyData.phone;
+    }
+
+    if (bodyData.gender) {
+      user.about.gender = bodyData.gender;
+    }
+
+    if (bodyData.address) {
+      user.address.addressLine = bodyData.address;
+    }
+
+    if (bodyData.pinCode) {
+      user.address.pincode = bodyData.pinCode;
+    }
+
+    if (bodyData.country) {
+      user.address.country = bodyData.country;
+    }
+
+    if (bodyData.schoolOrCollegeName) {
+      user.academic.schoolOrCollegeName = bodyData.schoolOrCollegeName;
+    }
+
+    if (bodyData.schoolOrCollegeAddress) {
+      user.academic.schoolOrCollegeAddress = bodyData.schoolOrCollegeAddress;
+    }
+
+    if (bodyData.class) {
+      user.preference.standard = bodyData.class;
+    }
+
+    if (bodyData.competitiveExams) {
+      user.preference.competitiveExam = bodyData.competitiveExams;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Personal information updated",
+      user,
+    });
+  } catch (error: any) {
+    console.error("Error updating personal info:", error);
+    next(new CustomError(error.message))
   }
 };
