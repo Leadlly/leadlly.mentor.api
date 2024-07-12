@@ -43,7 +43,6 @@ exports.mentorOauthCallback = mentorOauthCallback;
 const mentorlInfo = async (req, res, next) => {
     try {
         const bodyData = req.body;
-        console.log(req.user._id);
         const user = (await userModel_1.default.findById(req.user._id));
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -78,11 +77,11 @@ const mentorlInfo = async (req, res, next) => {
         if (bodyData.schoolOrCollegeAddress) {
             user.academic.schoolOrCollegeAddress = bodyData.schoolOrCollegeAddress;
         }
-        if (bodyData.standard) {
-            user.preference.standard = bodyData.standard;
+        if (bodyData.class) {
+            user.preference.standard = bodyData.class;
         }
-        if (bodyData.competitiveExam) {
-            user.preference.competitiveExam = bodyData.competitiveExam;
+        if (bodyData.competitiveExams) {
+            user.preference.competitiveExam = bodyData.competitiveExams;
         }
         await user.save();
         res.status(200).json({
