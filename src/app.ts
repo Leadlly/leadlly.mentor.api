@@ -8,6 +8,8 @@ import authRoutes from './routes/auth'
 import googleRoutes from './routes/googleAuth'
 import userRoutes from './routes/user'
 import meetingRoutes from './routes/meeting'
+import expressWinston from 'express-winston'
+import winston from 'winston'
 
 
 config({
@@ -18,6 +20,19 @@ config({
 
 const app = express();
 
+
+app.use(
+  expressWinston.logger({
+    transports: [new winston.transports.Console()],
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.cli(),
+    ),
+    meta: true,
+    expressFormat: true,
+    colorize: true,
+  }),
+);
 
 app.use(cookieParser())
 app.use(express.json())
