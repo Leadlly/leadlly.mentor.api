@@ -1,5 +1,12 @@
+import mongoose from 'mongoose';
 import { db } from '../../db/db';
 import Mentor from '../../models/userModel';
+
+interface StudentQuery {
+  $and: {
+    [key: string]: any;
+  }[];
+}
 
 export const allocateStudentsToMentor = async (mentorId: string) => {
   try {
@@ -14,7 +21,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     // Helper function to create tags
     const createTags = (competitiveExams: string[], standards: string[], gender: string) => {
-      const tags = [];
+      const tags: string[] = [];
       for (const exam of competitiveExams) {
         for (const standard of standards) {
           tags.push(`${exam}${standard}${gender}`);
@@ -30,28 +37,28 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
     ];
 
     // Find students with matching tags and no mentor assigned
+    const queries: StudentQuery[] = mentorTags.map(tag => {
+      const match = tag.match(/([a-zA-Z]+)(\d+)([a-zA-Z]*)/);
+      if (match) {
+        const [exam, standard, gender] = match.slice(1, 4);
+
+        const query: any = {
+          'academic.competitiveExam': exam,
+          'academic.standard': Number(standard),
+        };
+        if (gender) {
+          query['about.gender'] = gender;
+        }
+        console.log(query);
+        return { $and: [query] };
+      }
+      return null;
+    }).filter((query): query is StudentQuery => query !== null); 
+
     const students = await Student.find({
       'mentor.id': null,
-      $or: mentorTags.map(tag => {
-        const match = tag.match(/([a-zA-Z]+)(\d+)([a-zA-Z]*)/);
-        if (match) {
-          const [exam, standard, gender] = match.slice(1, 4);
-
-          const query: any = {
-            'academic.competitiveExam': exam,
-            'academic.standard': Number(standard),
-          };
-          if (gender) {
-            query['about.gender'] = gender;
-          }
-          console.log(query);
-          return { $and: [query] };
-        }
-
-        return null;
-      }).filter(query => query !== null)
+      $or: queries
     }).limit(30).toArray();
-
 
     if (students.length === 0) {
       console.log('No students found for allocation');
@@ -60,7 +67,6 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     const studentIds = students.map(student => student._id);
 
-    // Ensure mentor.students is an array and push student IDs
     mentor.students = mentor.students || [];
     mentor.students.push(...studentIds.map(id => ({ id, gmeet: { tokens: {}, link: null } })));
 
@@ -68,7 +74,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     await Student.updateMany(
       { _id: { $in: studentIds } },
-      { $set: { 'mentor.id': mentor._id } }
+      { $set: { 'mentor.id': new mongoose.Schema.Types.ObjectId(mentor._id) } }
     );
 
     console.log('Students allocated to mentor successfully');
