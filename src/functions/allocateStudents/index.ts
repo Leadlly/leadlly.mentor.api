@@ -24,7 +24,8 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
       const tags: string[] = [];
       for (const exam of competitiveExams) {
         for (const standard of standards) {
-          tags.push(`${exam}${standard}${gender}`);
+          const genderPart = gender ? gender : '';
+          tags.push(`${exam}${standard}${genderPart}`);
         }
       }
       return tags;
