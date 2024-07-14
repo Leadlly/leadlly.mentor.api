@@ -37,6 +37,8 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
       ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, '')
     ];
 
+    console.log('Generated mentor tags:', mentorTags);
+
     // Find students with matching tags and no mentor assigned
     const queries: StudentQuery[] = mentorTags.map(tag => {
       const match = tag.match(/([a-zA-Z]+)(\d+)([a-zA-Z]*)/);
@@ -75,7 +77,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     await Student.updateMany(
       { _id: { $in: studentIds } },
-      { $set: { 'mentor.id': new mongoose.Schema.Types.ObjectId(mentor._id) } }
+      { $set: { 'mentor.id': new mongoose.Types.ObjectId(mentor._id) } }
     );
 
     console.log('Students allocated to mentor successfully');

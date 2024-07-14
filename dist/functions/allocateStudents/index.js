@@ -32,6 +32,7 @@ const allocateStudentsToMentor = async (mentorId) => {
             ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, mentor.about.gender || ''),
             ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, '')
         ];
+        console.log('Generated mentor tags:', mentorTags);
         // Find students with matching tags and no mentor assigned
         const queries = mentorTags.map(tag => {
             const match = tag.match(/([a-zA-Z]+)(\d+)([a-zA-Z]*)/);
@@ -61,7 +62,7 @@ const allocateStudentsToMentor = async (mentorId) => {
         mentor.students = mentor.students || [];
         mentor.students.push(...studentIds.map(id => ({ id, gmeet: { tokens: {}, link: null } })));
         await mentor.save();
-        await Student.updateMany({ _id: { $in: studentIds } }, { $set: { 'mentor.id': new mongoose_1.default.Schema.Types.ObjectId(mentor._id) } });
+        await Student.updateMany({ _id: { $in: studentIds } }, { $set: { 'mentor.id': new mongoose_1.default.Types.ObjectId(mentor._id) } });
         console.log('Students allocated to mentor successfully');
     }
     catch (error) {

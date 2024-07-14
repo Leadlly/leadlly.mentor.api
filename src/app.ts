@@ -8,6 +8,7 @@ import authRoutes from './routes/auth'
 import googleRoutes from './routes/googleAuth'
 import userRoutes from './routes/user'
 import meetingRoutes from './routes/meeting'
+import studentRoutes from './routes/student'
 import expressWinston from 'express-winston'
 import winston from 'winston'
 
@@ -50,6 +51,7 @@ app.use('/api/auth', authRoutes)
 app.use("/api/google", googleRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/meeting", meetingRoutes);
+app.use("/api/student", studentRoutes)
 
 app.get('/', (req, res) => {
     res.send('Hello, world!');
