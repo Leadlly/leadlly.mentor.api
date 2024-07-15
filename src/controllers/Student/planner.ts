@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import moment from "moment-timezone";
 import { db } from "../../db/db";
 import { CustomError } from "../../middlewares/error";
+import mongoose from "mongoose";
 export const getStudentPlanner = async (
     req: Request,
     res: Response,
@@ -16,7 +17,7 @@ export const getStudentPlanner = async (
       const endDate = moment(startDate).endOf("isoWeek").toDate();
       
       const planner = await Planner.findOne({
-        student: userId,
+        student: new mongoose.Types.ObjectId(userId),
         startDate: { $gte: startDate },
         endDate: { $lte: endDate },
       });
