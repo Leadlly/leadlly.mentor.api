@@ -63,6 +63,44 @@ export const rescheduleMeeting = async (req: Request, res: Response, next: NextF
     }
 };
 
+
+export const scheduleMeeting = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const Meeting = db.collection("meetings");
+        const { date, time, studentIds } = req.body;
+
+        if (!date || !time || !Array.isArray(studentIds) || studentIds.length === 0) {
+            throw new CustomError("Invalid input data", 400);
+        }
+
+        const meetingDate = new Date(date);
+        if (isNaN(meetingDate.getTime())) {
+            throw new CustomError("Invalid date format", 400);
+        }
+
+        const mentorId = req.user._id;
+        const gmeetLink = req.user.gmeet;
+
+        const meetingInsertions = studentIds.map(studentId => ({
+            date: meetingDate,
+            time: time,
+            student: studentId,
+            mentor: mentorId,
+            gmeet: gmeetLink
+        }));
+
+        await Meeting.insertMany(meetingInsertions);
+
+        res.status(200).json({
+            success: true,
+            message: `Meeting scheduled successfully for ${studentIds.join(", ")}`,
+        });
+
+    } catch (error: any) {
+        next(new CustomError(error.message, error.status || 500));
+    }
+};
+
 export const getMeetings = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const Meeting = db.collection("meetings");

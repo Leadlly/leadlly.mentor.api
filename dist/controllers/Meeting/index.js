@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMeetings = exports.rescheduleMeeting = exports.acceptMeeting = void 0;
+exports.getMeetings = exports.scheduleMeeting = exports.rescheduleMeeting = exports.acceptMeeting = void 0;
 const error_1 = require("../../middlewares/error");
 const db_1 = require("../../db/db");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -55,6 +55,37 @@ const rescheduleMeeting = async (req, res, next) => {
     }
 };
 exports.rescheduleMeeting = rescheduleMeeting;
+const scheduleMeeting = async (req, res, next) => {
+    try {
+        const Meeting = db_1.db.collection("meetings");
+        const { date, time, studentIds } = req.body;
+        if (!date || !time || !Array.isArray(studentIds) || studentIds.length === 0) {
+            throw new error_1.CustomError("Invalid input data", 400);
+        }
+        const meetingDate = new Date(date);
+        if (isNaN(meetingDate.getTime())) {
+            throw new error_1.CustomError("Invalid date format", 400);
+        }
+        const mentorId = req.user._id;
+        const gmeetLink = req.user.gmeet;
+        const meetingInsertions = studentIds.map(studentId => ({
+            date: meetingDate,
+            time: time,
+            student: studentId,
+            mentor: mentorId,
+            gmeet: gmeetLink
+        }));
+        await Meeting.insertMany(meetingInsertions);
+        res.status(200).json({
+            success: true,
+            message: `Meeting scheduled successfully for ${studentIds.join(", ")}`,
+        });
+    }
+    catch (error) {
+        next(new error_1.CustomError(error.message, error.status || 500));
+    }
+};
+exports.scheduleMeeting = scheduleMeeting;
 const getMeetings = async (req, res, next) => {
     try {
         const Meeting = db_1.db.collection("meetings");
