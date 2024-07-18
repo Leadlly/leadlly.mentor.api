@@ -72,7 +72,7 @@ const getMeetings = async (req, res, next) => {
         }
         else {
             // Find mentor by mentorId and get all students
-            const mentor = await userModel_1.default.findById(mentorObjectId).populate('students.id');
+            const mentor = await userModel_1.default.findById(mentorObjectId);
             if (!mentor) {
                 throw new error_1.CustomError("Mentor not found", 404);
             }

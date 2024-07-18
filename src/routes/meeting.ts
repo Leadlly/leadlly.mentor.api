@@ -4,10 +4,10 @@ import { acceptMeeting, getMeetings, rescheduleMeeting } from "../controllers/Me
 
 const router = express.Router();
 
-router.put("/meeting/accept/:meetingId", checkAuth, acceptMeeting);
+router.put("/accept/:meetingId", checkAuth, acceptMeeting);
 
 // Route to reschedule a meeting
-router.put("/meeting/reschedule/:meetingId", checkAuth, rescheduleMeeting);
-router.get("/meeting/get", checkAuth, getMeetings);
+router.put("/reschedule/:meetingId", checkAuth, rescheduleMeeting);
+router.get("/get", checkAuth, getMeetings);
 
 export default router

@@ -82,7 +82,7 @@ export const getMeetings = async (req: Request, res: Response, next: NextFunctio
             query.student = studentObjectId;
         } else {
             // Find mentor by mentorId and get all students
-            const mentor = await Mentor.findById(mentorObjectId).populate('students.id');
+            const mentor = await Mentor.findById(mentorObjectId)
             if (!mentor) {
                 throw new CustomError("Mentor not found", 404);
             }
