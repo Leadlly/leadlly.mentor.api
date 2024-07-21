@@ -10,20 +10,22 @@ export const acceptMeeting = async (req: Request, res: Response, next: NextFunct
         const Meeting = db.collection("meetings")
         const { meetingId } = req.params;
 
-        const meeting = await Meeting.findOne({ _id: new mongoose.Schema.Types.ObjectId(meetingId)});
+        const meeting = await Meeting.findOne({ _id: new mongoose.Types.ObjectId(meetingId)});
         if (!meeting) {
             throw new CustomError("Meeting not found", 404);
         }
 
-        meeting.accepted = true;
-        meeting.updatedAt = new Date();
-
-        await meeting.save();
+        await Meeting.updateOne(
+            { _id: new mongoose.Types.ObjectId(meetingId) },
+            { $set: { 
+                accepted: true,
+                updatedAt: new Date()
+            }}
+        );
 
         res.status(200).json({
             success: true,
             message: "Meeting accepted successfully",
-            meeting
         });
 
     } catch (error: any) {
@@ -38,13 +40,13 @@ export const rescheduleMeeting = async (req: Request, res: Response, next: NextF
         const { meetingId } = req.params;
         const { date, time } = req.body;
 
-        const meeting = await Meeting.findOne({ _id: new mongoose.Schema.Types.ObjectId(meetingId) });
+        const meeting = await Meeting.findOne({ _id: new mongoose.Types.ObjectId(meetingId) });
         if (!meeting) {
             throw new CustomError("Meeting not found", 404);
         }
 
         await Meeting.updateOne(
-            { _id: new mongoose.Schema.Types.ObjectId(meetingId) },
+            { _id: new mongoose.Types.ObjectId(meetingId) },
             { $set: { 
                 "rescheduled.isRescheduled": true,
                 "rescheduled.date": new Date(date),
