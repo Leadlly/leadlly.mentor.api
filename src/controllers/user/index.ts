@@ -91,6 +91,14 @@ export const mentorlInfo = async (req: Request, res: Response, next: NextFunctio
       user.academic.schoolOrCollegeAddress = bodyData.schoolOrCollegeAddress;
     }
 
+    if (bodyData.degree) {
+      user.academic.degree = bodyData.degree;
+    }
+
+    if (bodyData.gmeet) {
+      user.gmeet.link = bodyData.gmeet;
+    }
+
     if (bodyData.class) {
       user.preference.standard = bodyData.class;
     }
