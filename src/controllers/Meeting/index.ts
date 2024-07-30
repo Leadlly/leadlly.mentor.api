@@ -88,7 +88,10 @@ export const scheduleMeeting = async (req: Request, res: Response, next: NextFun
             time: time,
             student: new mongoose.Types.ObjectId(studentId),
             mentor:  new mongoose.Types.ObjectId(mentorId),
-            gmeet: gmeetLink
+            gmeet: gmeetLink,
+            createdBy: 'mentor',
+            isCompleted: false,
+            accepted: true
         }));
 
         await Meeting.insertMany(meetingInsertions);

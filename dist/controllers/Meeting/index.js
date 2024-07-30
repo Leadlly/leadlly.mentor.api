@@ -73,7 +73,10 @@ const scheduleMeeting = async (req, res, next) => {
             time: time,
             student: new mongoose_1.default.Types.ObjectId(studentId),
             mentor: new mongoose_1.default.Types.ObjectId(mentorId),
-            gmeet: gmeetLink
+            gmeet: gmeetLink,
+            createdBy: 'mentor',
+            isCompleted: false,
+            accepted: true
         }));
         await Meeting.insertMany(meetingInsertions);
         res.status(200).json({
