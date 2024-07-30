@@ -31,11 +31,21 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
       return tags;
     };
 
-    // Create all possible mentor tags
-    const mentorTags = [
-      ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, mentor.about.gender || ''),
-      ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, '')
-    ];
+    const { competitiveExam, standard } = mentor.preference;
+    const gender = mentor.about.gender || '';
+
+    let mentorTags: string[] = [];
+
+    // If only one competitive exam is selected, create tags only for that exam
+    if (competitiveExam.length === 1) {
+      mentorTags = createTags(competitiveExam, standard, gender);
+    } else {
+      // Create all possible mentor tags if multiple competitive exams are selected
+      mentorTags = [
+        ...createTags(competitiveExam, standard, gender),
+        ...createTags(competitiveExam, standard, '')
+      ];
+    }
 
     console.log('Generated mentor tags:', mentorTags);
 

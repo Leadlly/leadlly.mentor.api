@@ -86,8 +86,8 @@ export const scheduleMeeting = async (req: Request, res: Response, next: NextFun
         const meetingInsertions = studentIds.map(studentId => ({
             date: meetingDate,
             time: time,
-            student: studentId,
-            mentor: mentorId,
+            student: new mongoose.Types.ObjectId(studentId),
+            mentor:  new mongoose.Types.ObjectId(mentorId),
             gmeet: gmeetLink
         }));
 

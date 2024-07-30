@@ -27,11 +27,20 @@ const allocateStudentsToMentor = async (mentorId) => {
             }
             return tags;
         };
-        // Create all possible mentor tags
-        const mentorTags = [
-            ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, mentor.about.gender || ''),
-            ...createTags(mentor.preference.competitiveExam, mentor.preference.standard, '')
-        ];
+        const { competitiveExam, standard } = mentor.preference;
+        const gender = mentor.about.gender || '';
+        let mentorTags = [];
+        // If only one competitive exam is selected, create tags only for that exam
+        if (competitiveExam.length === 1) {
+            mentorTags = createTags(competitiveExam, standard, gender);
+        }
+        else {
+            // Create all possible mentor tags if multiple competitive exams are selected
+            mentorTags = [
+                ...createTags(competitiveExam, standard, gender),
+                ...createTags(competitiveExam, standard, '')
+            ];
+        }
         console.log('Generated mentor tags:', mentorTags);
         // Find students with matching tags and no mentor assigned
         const queries = mentorTags.map(tag => {

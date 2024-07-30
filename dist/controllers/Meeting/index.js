@@ -71,8 +71,8 @@ const scheduleMeeting = async (req, res, next) => {
         const meetingInsertions = studentIds.map(studentId => ({
             date: meetingDate,
             time: time,
-            student: studentId,
-            mentor: mentorId,
+            student: new mongoose_1.default.Types.ObjectId(studentId),
+            mentor: new mongoose_1.default.Types.ObjectId(mentorId),
             gmeet: gmeetLink
         }));
         await Meeting.insertMany(meetingInsertions);
