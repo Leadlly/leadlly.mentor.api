@@ -49,7 +49,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     console.log('Generated mentor tags:', mentorTags);
 
-    // Find students with matching tags and no mentor assigned
+    // Find students with matching tags, no mentor assigned, and not disabled
     const queries: StudentQuery[] = mentorTags.map(tag => {
       const match = tag.match(/([a-zA-Z]+)(\d+)([a-zA-Z]*)/);
       if (match) {
@@ -58,6 +58,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
         const query: any = {
           'academic.competitiveExam': exam,
           'academic.standard': Number(standard),
+          'disabled': { $ne: true } // Exclude students with disabled: true
         };
         if (gender) {
           query['about.gender'] = gender;

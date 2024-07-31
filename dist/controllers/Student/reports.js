@@ -7,14 +7,15 @@ exports.getOverallReport = exports.getMonthlyReport = exports.getWeeklyReport = 
 const moment_1 = __importDefault(require("moment"));
 const db_1 = require("../../db/db");
 const error_1 = require("../../middlewares/error");
+const mongoose_1 = __importDefault(require("mongoose"));
 const getWeeklyReport = async (req, res, next) => {
     try {
-        const { studentId } = req.query;
+        const studentId = req.query.studentId;
         const StudentReport = db_1.db.collection("studentreports");
         const startDate = (0, moment_1.default)().startOf("isoWeek");
         const endDate = (0, moment_1.default)().endOf("isoWeek");
         const reports = await StudentReport.find({
-            user: studentId,
+            user: new mongoose_1.default.Types.ObjectId(studentId),
             date: { $gte: startDate.toDate(), $lte: endDate.toDate() },
         }).toArray();
         const daysInWeek = [];
@@ -47,12 +48,12 @@ const getWeeklyReport = async (req, res, next) => {
 exports.getWeeklyReport = getWeeklyReport;
 const getMonthlyReport = async (req, res, next) => {
     try {
-        const { studentId } = req.query;
+        const studentId = req.query.studentId;
         const StudentReport = db_1.db.collection("studentreports");
         const startDate = (0, moment_1.default)().startOf("month");
         const endDate = (0, moment_1.default)().endOf("month");
         const reports = await StudentReport.find({
-            user: studentId,
+            user: new mongoose_1.default.Types.ObjectId(studentId),
             date: { $gte: startDate.toDate(), $lte: endDate.toDate() },
         }).toArray();
         const daysInMonth = [];
@@ -85,10 +86,10 @@ const getMonthlyReport = async (req, res, next) => {
 exports.getMonthlyReport = getMonthlyReport;
 const getOverallReport = async (req, res, next) => {
     try {
-        const { studentId } = req.query;
+        const studentId = req.query.studentId;
         const StudentReport = db_1.db.collection("studentreports");
         const reports = await StudentReport.find({
-            user: studentId,
+            user: new mongoose_1.default.Types.ObjectId(studentId),
         }).toArray();
         if (!reports.length)
             return next(new error_1.CustomError("No reports found for the user"));

@@ -2,19 +2,20 @@ import moment from "moment";
 import { Request, Response, NextFunction } from "express";
 import { db } from "../../db/db";
 import { CustomError } from "../../middlewares/error";
+import mongoose from "mongoose";
 export const getWeeklyReport = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { studentId } = req.query;
+    const studentId = req.query.studentId as string | undefined;
     const StudentReport = db.collection("studentreports");
     const startDate = moment().startOf("isoWeek");
     const endDate = moment().endOf("isoWeek");
 
     const reports = await StudentReport.find({
-      user: studentId,
+      user: new mongoose.Types.ObjectId(studentId),
       date: { $gte: startDate.toDate(), $lte: endDate.toDate() },
     }).toArray();
 
@@ -57,14 +58,14 @@ export const getMonthlyReport = async (
   next: NextFunction
 ) => {
   try {
-    const { studentId } = req.query;
+    const studentId = req.query.studentId as string | undefined;
     const StudentReport = db.collection("studentreports");
 
     const startDate = moment().startOf("month");
     const endDate = moment().endOf("month");
 
     const reports = await StudentReport.find({
-      user: studentId,
+      user: new mongoose.Types.ObjectId(studentId),
       date: { $gte: startDate.toDate(), $lte: endDate.toDate() },
     }).toArray();
 
@@ -107,11 +108,11 @@ export const getOverallReport = async (
   next: NextFunction
 ) => {
   try {
-    const { studentId } = req.query;
+    const studentId = req.query.studentId as string | undefined;
     const StudentReport = db.collection("studentreports");
 
     const reports = await StudentReport.find({
-      user: studentId,
+      user: new mongoose.Types.ObjectId(studentId),
     }).toArray();
 
     if (!reports.length)
