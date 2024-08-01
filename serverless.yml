@@ -20,12 +20,6 @@ provider:
     SMTP_USER: ${ssm:/leadlly/SMTP_USER}
     SMTP_PASS: ${ssm:/leadlly/SMTP_PASS}
 
-package:
-  exclude:
-    - .git/**
-    - .env
-    - src/**
-
 functions:
   api:
     handler: dist/server.handler
