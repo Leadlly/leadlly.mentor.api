@@ -23,8 +23,8 @@ export const getStudentPlanner = async (
       endDate = moment(requestEndDate).tz("Asia/Kolkata").endOf("day").utc().toDate();
     } else {
       // Default to this week in UTC
-      startDate = moment().tz("Asia/Kolkata").startOf("isoWeek").utc().toDate();
-      endDate = moment(startDate).endOf("isoWeek").utc().toDate();
+      startDate = moment().startOf("isoWeek").toDate();
+      endDate = moment(startDate).endOf("isoWeek").toDate();
     }
 
     // Query the database using UTC dates

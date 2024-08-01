@@ -21,8 +21,8 @@ const getStudentPlanner = async (req, res, next) => {
         }
         else {
             // Default to this week in UTC
-            startDate = (0, moment_timezone_1.default)().tz("Asia/Kolkata").startOf("isoWeek").utc().toDate();
-            endDate = (0, moment_timezone_1.default)(startDate).endOf("isoWeek").utc().toDate();
+            startDate = (0, moment_timezone_1.default)().startOf("isoWeek").toDate();
+            endDate = (0, moment_timezone_1.default)(startDate).endOf("isoWeek").toDate();
         }
         // Query the database using UTC dates
         const planner = await Planner.findOne({
