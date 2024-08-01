@@ -67,7 +67,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
         return { $and: [query] };
       }
       return null;
-    }).filter((query): query is StudentQuery => query !== null); 
+    }).filter((query): query is StudentQuery => query !== null);
 
     const students = await Student.find({
       'mentor.id': null,
@@ -81,13 +81,30 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     const studentIds = students.map(student => student._id);
 
+    // Filter out students already assigned to the mentor
+    const existingStudentIds = mentor.students?.map(student => student.id) || [];
+    const newStudentIds = studentIds.filter(id => !existingStudentIds.includes(id));
+
+    // Calculate how many more students are needed to reach 30
+    const currentCount = existingStudentIds.length;
+    const neededCount = 30 - currentCount;
+
+    const studentsToAdd = newStudentIds.slice(0, neededCount);
+
+    if (studentsToAdd.length === 0) {
+      console.log('No new students to add');
+      return;
+    }
+
     mentor.students = mentor.students || [];
-    mentor.students.push(...studentIds.map(id => ({ id, gmeet: { tokens: {}, link: null } })));
+    mentor.students.push(
+      ...studentsToAdd.map(id => ({ id, gmeet: { tokens: {}, link: null } }))
+    );
 
     await mentor.save();
 
     await Student.updateMany(
-      { _id: { $in: studentIds } },
+      { _id: { $in: studentsToAdd } },
       { $set: { 'mentor.id': new mongoose.Types.ObjectId(mentor._id) } }
     );
 
