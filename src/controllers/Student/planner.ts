@@ -3,6 +3,7 @@ import moment from "moment-timezone";
 import { db } from "../../db/db";
 import { CustomError } from "../../middlewares/error";
 import mongoose from "mongoose";
+
 export const getStudentPlanner = async (
   req: Request,
   res: Response,
@@ -17,11 +18,13 @@ export const getStudentPlanner = async (
     let startDate, endDate;
 
     if (requestStartDate && requestEndDate) {
-      startDate = moment(requestStartDate).tz("Asia/Kolkata").startOf("day").toDate();
+      // Convert to UTC dates
+      startDate = moment(requestStartDate).tz("Asia/Kolkata").startOf("day").utc().toDate();
       endDate = moment(requestEndDate).tz("Asia/Kolkata").endOf("day").utc().toDate();
     } else {
-      startDate = moment().tz("Asia/Kolkata").startOf("isoWeek").toDate();
-      endDate = moment(startDate).endOf("isoWeek").toDate();
+      // Default to this week in UTC
+      startDate = moment().tz("Asia/Kolkata").startOf("isoWeek").utc().toDate();
+      endDate = moment(startDate).endOf("isoWeek").utc().toDate();
     }
 
     // Query the database using UTC dates
