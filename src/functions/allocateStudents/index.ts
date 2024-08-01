@@ -69,7 +69,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
       return null;
     }).filter((query): query is StudentQuery => query !== null);
 
-    const students = await Student.find({
+    let students = await Student.find({
       'mentor.id': null,
       $or: queries
     }).limit(30).toArray();
@@ -77,6 +77,19 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
     if (students.length === 0) {
       console.log('No students found for allocation');
       return;
+    }
+
+    // If only one competitive exam is selected, prioritize male students first
+    if (competitiveExam.length === 1) {
+      students.sort((a, b) => {
+        if (a.about.gender === 'male' && b.about.gender === 'female') {
+          return -1;
+        } else if (a.about.gender === 'female' && b.about.gender === 'male') {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     }
 
     const studentIds = students.map(student => student._id);
