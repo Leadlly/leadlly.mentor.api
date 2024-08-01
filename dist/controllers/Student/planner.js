@@ -12,18 +12,15 @@ const getStudentPlanner = async (req, res, next) => {
     try {
         const Planner = db_1.db.collection('planners');
         const userId = req.params.id;
-        // Extract startDate and endDate from the request body
         const { startDate: requestStartDate, endDate: requestEndDate } = req.body;
         let startDate, endDate;
         if (requestStartDate && requestEndDate) {
-            // Convert provided startDate and endDate to Asia/Kolkata timezone and then to UTC
-            startDate = (0, moment_timezone_1.default)(requestStartDate).tz("Asia/Kolkata").startOf("day").utc().toDate();
+            startDate = (0, moment_timezone_1.default)(requestStartDate).tz("Asia/Kolkata").startOf("day").toDate();
             endDate = (0, moment_timezone_1.default)(requestEndDate).tz("Asia/Kolkata").endOf("day").utc().toDate();
         }
         else {
-            // Default to current week in Asia/Kolkata timezone and convert to UTC
-            startDate = (0, moment_timezone_1.default)().tz("Asia/Kolkata").startOf("isoWeek").utc().toDate();
-            endDate = (0, moment_timezone_1.default)(startDate).endOf("isoWeek").utc().toDate();
+            startDate = (0, moment_timezone_1.default)().tz("Asia/Kolkata").startOf("isoWeek").toDate();
+            endDate = (0, moment_timezone_1.default)(startDate).endOf("isoWeek").toDate();
         }
         // Query the database using UTC dates
         const planner = await Planner.findOne({
