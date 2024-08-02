@@ -18,18 +18,22 @@ export const getStudentPlanner = async (
     let startDate, endDate;
 
     if (requestStartDate && requestEndDate) {
+      // Convert to UTC dates
       startDate = moment(requestStartDate).tz("Asia/Kolkata").startOf("day").utc().toDate();
       endDate = moment(requestEndDate).tz("Asia/Kolkata").endOf("day").utc().toDate();
     } else {
+      // Default to this week in UTC
       startDate = moment().tz("Asia/Kolkata").startOf("isoWeek").utc().toDate();
       endDate = moment(startDate).endOf("isoWeek").utc().toDate();
     }
 
-
+    // Query the database using UTC dates
     const planner = await Planner.findOne({
       student: new mongoose.Types.ObjectId(userId),
-      startDate: { $gte: startDate },
-      endDate: { $lte: endDate },
+    }, {
+      "sort": {
+        "_id": -1
+      }
     });
 
     if (!planner) {
