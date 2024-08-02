@@ -74,7 +74,6 @@ const mentorSchema = new Schema({
     id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      default: []
     },
     gmeet: {
       tokens: {},
