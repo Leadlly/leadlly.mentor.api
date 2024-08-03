@@ -77,7 +77,7 @@ const scheduleMeeting = async (req, res, next) => {
             createdBy: 'mentor',
             isCompleted: false,
             accepted: true,
-            message
+            message: message || "Introductory Workshop"
         }));
         await Meeting.insertMany(meetingInsertions);
         res.status(200).json({

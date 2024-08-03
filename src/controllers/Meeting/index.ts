@@ -92,7 +92,7 @@ export const scheduleMeeting = async (req: Request, res: Response, next: NextFun
             createdBy: 'mentor',
             isCompleted: false,
             accepted: true,
-            message
+            message: message || "Introductory Workshop"
         }));
 
         await Meeting.insertMany(meetingInsertions);
