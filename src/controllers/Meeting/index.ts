@@ -69,7 +69,7 @@ export const rescheduleMeeting = async (req: Request, res: Response, next: NextF
 export const scheduleMeeting = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const Meeting = db.collection("meetings");
-        const { date, time, studentIds } = req.body;
+        const { date, time, studentIds, message } = req.body;
 
         if (!date || !time || !Array.isArray(studentIds) || studentIds.length === 0) {
             throw new CustomError("Invalid input data", 400);
@@ -91,7 +91,8 @@ export const scheduleMeeting = async (req: Request, res: Response, next: NextFun
             gmeet: gmeetLink,
             createdBy: 'mentor',
             isCompleted: false,
-            accepted: true
+            accepted: true,
+            message
         }));
 
         await Meeting.insertMany(meetingInsertions);
