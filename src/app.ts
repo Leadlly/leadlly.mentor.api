@@ -52,7 +52,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/meeting", meetingRoutes);
 app.use("/api/student", studentRoutes)
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.send('Hello, world!');
 });
 
