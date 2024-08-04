@@ -20,11 +20,9 @@ export const getStudentPlanner = async (
     let startDate, endDate;
 
     if (requestStartDate && requestEndDate) {
-      // Convert provided startDate and endDate to IST
       startDate = moment(requestStartDate).tz("Asia/Kolkata").startOf("day").toDate();
       endDate = moment(requestEndDate).tz("Asia/Kolkata").endOf("day").toDate();
     } else {
-      // Default to current week
       startDate = moment().tz("Asia/Kolkata").startOf("isoWeek").toDate();
       endDate = moment(startDate).tz("Asia/Kolkata").endOf("isoWeek").toDate();
     }

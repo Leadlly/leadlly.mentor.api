@@ -16,12 +16,10 @@ const getStudentPlanner = async (req, res, next) => {
         const { startDate: requestStartDate, endDate: requestEndDate } = req.body;
         let startDate, endDate;
         if (requestStartDate && requestEndDate) {
-            // Convert provided startDate and endDate to IST
             startDate = (0, moment_timezone_1.default)(requestStartDate).tz("Asia/Kolkata").startOf("day").toDate();
             endDate = (0, moment_timezone_1.default)(requestEndDate).tz("Asia/Kolkata").endOf("day").toDate();
         }
         else {
-            // Default to current week
             startDate = (0, moment_timezone_1.default)().tz("Asia/Kolkata").startOf("isoWeek").toDate();
             endDate = (0, moment_timezone_1.default)(startDate).tz("Asia/Kolkata").endOf("isoWeek").toDate();
         }
