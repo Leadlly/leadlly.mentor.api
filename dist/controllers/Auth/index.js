@@ -32,7 +32,6 @@ const register = async (req, res, next) => {
             tag: "otp"
         });
         const salt = crypto_1.default.randomBytes(16).toString("hex");
-        console.log(salt);
         crypto_1.default.pbkdf2(password, salt, 1000, 64, "sha512", async (err, derivedKey) => {
             const nameArray = name.split(" ");
             const newUser = {
@@ -82,10 +81,8 @@ const register = async (req, res, next) => {
 };
 exports.register = register;
 const resentOtp = async (req, res, next) => {
-    console.log("inside resent otp");
     try {
         const { email } = req.body;
-        console.log(email);
         const otpRecord = await db_1.db.collection("otps").findOne({ email });
         if (!otpRecord)
             return next(new error_1.CustomError("User not found", 404));
@@ -155,11 +152,9 @@ const login = async (req, res, next) => {
         const user = await userModel_1.default.findOne({ email }).select("+password");
         if (!user)
             return next(new error_1.CustomError("Email not registered", 404));
-        console.log("here");
         const isMatched = await user.comparePassword(password);
         if (!isMatched)
             return next(new error_1.CustomError("Wrong password", 400));
-        console.log("hi");
         (0, setCookie_1.default)({
             user,
             res,
@@ -223,13 +218,19 @@ const resetpassword = async (req, res, next) => {
         });
         if (!user)
             return next(new error_1.CustomError("Your link is expired! Try again", 400));
-        user.password = req.body.password;
-        user.resetPasswordToken = null;
-        user.resetTokenExpiry = null;
-        await user.save();
-        res.status(200).json({
-            success: true,
-            message: "You password has been changed",
+        const salt = crypto_1.default.randomBytes(16).toString("hex");
+        crypto_1.default.pbkdf2(req.body.password, salt, 1000, 64, "sha512", async (err, derivedKey) => {
+            if (err)
+                return next(new error_1.CustomError(err.message, 500));
+            user.password = derivedKey.toString("hex");
+            user.salt = salt;
+            user.resetPasswordToken = null;
+            user.resetTokenExpiry = null;
+            await user.save();
+            res.status(200).json({
+                success: true,
+                message: "You password has been changed",
+            });
         });
     }
     catch (error) {

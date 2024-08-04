@@ -40,7 +40,6 @@ export const register = async (
 
 
     const salt = crypto.randomBytes(16).toString("hex");
-    console.log(salt)
     crypto.pbkdf2(
       password,
       salt,
@@ -105,10 +104,8 @@ export const resentOtp = async (
   res: Response,
   next: NextFunction,
 ) => {
-  console.log("inside resent otp")
   try {
     const { email } = req.body;
-    console.log(email)
 
     const otpRecord = await db.collection("otps").findOne({ email });
     if (!otpRecord) return next(new CustomError("User not found", 404));
@@ -198,11 +195,9 @@ export const login = async (
     const user = await User.findOne({ email }).select("+password");
     if (!user) return next(new CustomError("Email not registered", 404));
 
-    console.log("here")
     const isMatched = await user.comparePassword(password);
     if (!isMatched) return next(new CustomError("Wrong password", 400));
 
-    console.log("hi")
     setCookie({
       user,
       res,
@@ -280,15 +275,29 @@ export const resetpassword = async (
     if (!user)
       return next(new CustomError("Your link is expired! Try again", 400));
 
-    user.password = req.body.password;
-    user.resetPasswordToken = null;
-    user.resetTokenExpiry = null;
+    const salt = crypto.randomBytes(16).toString("hex");
+    crypto.pbkdf2(
+      req.body.password,
+      salt,
+      1000,
+      64,
+      "sha512",
+      async (err, derivedKey) => {
+        if (err) return next(new CustomError(err.message, 500));
 
-    await user.save();
-    res.status(200).json({
-      success: true,
-      message: "You password has been changed",
-    });
+        user.password = derivedKey.toString("hex");
+        user.salt = salt;
+        user.resetPasswordToken = null;
+        user.resetTokenExpiry = null;
+
+        await user.save();
+
+        res.status(200).json({
+          success: true,
+          message: "You password has been changed",
+        });
+      },
+    );
   } catch (error: any) {
     next(new CustomError(error.message));
   }

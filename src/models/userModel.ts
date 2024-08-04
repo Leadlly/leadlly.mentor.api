@@ -140,7 +140,6 @@ mentorSchema.methods.comparePassword = async function (
     );
   });
 
-  console.log(hashedPassword, "-------->",  this.password)
   return hashedPassword === this.password;
 };
 

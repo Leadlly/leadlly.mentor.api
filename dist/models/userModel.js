@@ -149,7 +149,6 @@ mentorSchema.methods.comparePassword = async function (candidatePassword) {
             resolve(derivedKey.toString('hex'));
         });
     });
-    console.log(hashedPassword, "-------->", this.password);
     return hashedPassword === this.password;
 };
 mentorSchema.methods.getToken = async function () {
