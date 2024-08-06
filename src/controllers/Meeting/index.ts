@@ -111,15 +111,26 @@ export const getMeetings = async (req: Request, res: Response, next: NextFunctio
     try {
         const Meeting = db.collection("meetings");
         const mentorId = req.user._id;
-        const { studentId } = req.query;
+        const { studentId, meeting, createdBy } = req.query;
 
         // Convert mentorId to ObjectId
         const mentorObjectId = new mongoose.Types.ObjectId(mentorId);
 
         // Initialize a query object
         let query: any = {
-            mentor: mentorObjectId
+            mentor: mentorObjectId,
+            createdBy: 'student'
         };
+
+        if (createdBy) {
+            query.createdBy = createdBy;
+        }
+
+        if (meeting === 'done') {
+            query.isCompleted = true;
+        } else {
+            query.isCompleted = false;
+        }
 
         if (studentId) {
             const studentObjectId = new mongoose.Types.ObjectId(studentId as string);

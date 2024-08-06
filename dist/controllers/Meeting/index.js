@@ -91,16 +91,27 @@ const scheduleMeeting = async (req, res, next) => {
 };
 exports.scheduleMeeting = scheduleMeeting;
 const getMeetings = async (req, res, next) => {
+    console.log("inside meeting");
     try {
         const Meeting = db_1.db.collection("meetings");
         const mentorId = req.user._id;
-        const { studentId } = req.query;
+        const { studentId, meeting, createdBy } = req.query;
         // Convert mentorId to ObjectId
         const mentorObjectId = new mongoose_1.default.Types.ObjectId(mentorId);
         // Initialize a query object
         let query = {
-            mentor: mentorObjectId
+            mentor: mentorObjectId,
+            createdBy: 'student'
         };
+        if (createdBy) {
+            query.createdBy = createdBy;
+        }
+        if (meeting === 'done') {
+            query.isCompleted = true;
+        }
+        else {
+            query.isCompleted = false;
+        }
         if (studentId) {
             const studentObjectId = new mongoose_1.default.Types.ObjectId(studentId);
             query.student = studentObjectId;
