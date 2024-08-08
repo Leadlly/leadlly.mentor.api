@@ -119,7 +119,6 @@ export const getMeetings = async (req: Request, res: Response, next: NextFunctio
         // Initialize a query object
         let query: any = {
             mentor: mentorObjectId,
-            createdBy: 'student'
         };
 
         if (createdBy) {

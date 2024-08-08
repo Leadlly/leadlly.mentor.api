@@ -91,7 +91,6 @@ const scheduleMeeting = async (req, res, next) => {
 };
 exports.scheduleMeeting = scheduleMeeting;
 const getMeetings = async (req, res, next) => {
-    console.log("inside meeting");
     try {
         const Meeting = db_1.db.collection("meetings");
         const mentorId = req.user._id;
@@ -101,7 +100,6 @@ const getMeetings = async (req, res, next) => {
         // Initialize a query object
         let query = {
             mentor: mentorObjectId,
-            createdBy: 'student'
         };
         if (createdBy) {
             query.createdBy = createdBy;
