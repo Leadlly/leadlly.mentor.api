@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 export const getErrorBook = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const SolvedQuestions = db.collection('SolvedQuestions');
+		const SolvedQuestions = db.collection('solvedquestions');
 		const userId = req.params.id;
 		const errorBook = await SolvedQuestions.aggregate([
 			{
@@ -66,7 +66,7 @@ export const getErrorBook = async (req: Request, res: Response, next: NextFuncti
 };
 export const getChapterErrorBook = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const SolvedQuestions = db.collection('SolvedQuestions');
+		const SolvedQuestions = db.collection('solvedquestions');
 		const userId = req.params.id;
 		const chapterName = req.params.chapter;
 		const chapterErrorBook = await SolvedQuestions.aggregate([

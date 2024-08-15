@@ -9,7 +9,7 @@ const error_1 = require("../../middlewares/error");
 const mongoose_1 = __importDefault(require("mongoose"));
 const getErrorBook = async (req, res, next) => {
     try {
-        const SolvedQuestions = db_1.db.collection('SolvedQuestions');
+        const SolvedQuestions = db_1.db.collection('solvedquestions');
         const userId = req.params.id;
         const errorBook = await SolvedQuestions.aggregate([
             {
@@ -70,7 +70,7 @@ const getErrorBook = async (req, res, next) => {
 exports.getErrorBook = getErrorBook;
 const getChapterErrorBook = async (req, res, next) => {
     try {
-        const SolvedQuestions = db_1.db.collection('SolvedQuestions');
+        const SolvedQuestions = db_1.db.collection('solvedquestions');
         const userId = req.params.id;
         const chapterName = req.params.chapter;
         const chapterErrorBook = await SolvedQuestions.aggregate([
