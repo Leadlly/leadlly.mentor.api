@@ -68,13 +68,14 @@ export const getChapterErrorBook = async (req: Request, res: Response, next: Nex
 	try {
 		const SolvedQuestions = db.collection('solvedquestions');
 		const userId = req.params.id;
-		const chapterName = req.params.chapter;
+		const {chapter} = req.query;
+		console.log(chapter, userId, "here is the data")
 		const chapterErrorBook = await SolvedQuestions.aggregate([
 			{
 				$match: {
 					student: new mongoose.Types.ObjectId(userId),
 					isCorrect: false,
-					'question.chapter': chapterName,
+					'question.chapter': chapter,
 				},
 			},
 			{

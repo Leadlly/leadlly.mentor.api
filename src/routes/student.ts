@@ -19,6 +19,6 @@ router.get('/report/month', checkAuth, getMonthlyReport);
 router.get('/report/overall', checkAuth, getOverallReport);
 
 router.get('/errorBook/get/:id', checkAuth, getErrorBook);
-router.get('errorBook/chapter/:chapterName/get/:id', checkAuth, getChapterErrorBook);
+router.get('/errorBook/chapter/get/:id', checkAuth, getChapterErrorBook);
 router.get('/quiz/weeklyQuiz/get/:id', checkAuth, getWeeklyQuiz);
 export default router;

@@ -72,13 +72,13 @@ const getChapterErrorBook = async (req, res, next) => {
     try {
         const SolvedQuestions = db_1.db.collection('solvedquestions');
         const userId = req.params.id;
-        const chapterName = req.params.chapter;
+        const { chapter } = req.query;
         const chapterErrorBook = await SolvedQuestions.aggregate([
             {
                 $match: {
                     student: new mongoose_1.default.Types.ObjectId(userId),
                     isCorrect: false,
-                    'question.chapter': chapterName,
+                    'question.chapter': chapter,
                 },
             },
             {
