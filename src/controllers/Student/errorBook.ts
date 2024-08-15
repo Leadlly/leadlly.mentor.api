@@ -47,12 +47,12 @@ export const getErrorBook = async (req: Request, res: Response, next: NextFuncti
 			{ $sort: { subject: 1 } },
 		]).toArray();
 
-		if (!errorBook || errorBook.length < 1) {
-			return res.status(200).json({
-				success: true,
-				message: 'No ErrorBook data found for this user',
-			});
-		}
+		// if (!errorBook || errorBook.length < 1) {
+		// 	return res.status(400).json({
+		// 		success: false,
+		// 		message: 'No ErrorBook data found for this user',
+		// 	});
+		// }
 
 		return res.status(200).json({
 			success: true,
