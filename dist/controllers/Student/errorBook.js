@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getChapterErrorBook = exports.getErrorBook = void 0;
 const db_1 = require("../../db/db");
 const error_1 = require("../../middlewares/error");
+const mongoose_1 = __importDefault(require("mongoose"));
 const getErrorBook = async (req, res, next) => {
     try {
         const SolvedQuestions = db_1.db.collection('SolvedQuestions');
@@ -10,7 +14,7 @@ const getErrorBook = async (req, res, next) => {
         const errorBook = await SolvedQuestions.aggregate([
             {
                 $match: {
-                    student: req.user._id,
+                    student: new mongoose_1.default.Types.ObjectId(userId),
                     isCorrect: false,
                 },
             },
@@ -72,7 +76,7 @@ const getChapterErrorBook = async (req, res, next) => {
         const chapterErrorBook = await SolvedQuestions.aggregate([
             {
                 $match: {
-                    student: req.user._id,
+                    student: new mongoose_1.default.Types.ObjectId(userId),
                     isCorrect: false,
                     'question.chapter': chapterName,
                 },
@@ -93,7 +97,6 @@ const getChapterErrorBook = async (req, res, next) => {
             success: true,
             chapterErrorBook,
         });
-        console.log(chapterErrorBook);
     }
     catch (error) {
         console.error(error);

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { db } from '../../db/db';
 import { CustomError } from '../../middlewares/error';
+import mongoose from 'mongoose';
 
 export const getErrorBook = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -9,7 +10,7 @@ export const getErrorBook = async (req: Request, res: Response, next: NextFuncti
 		const errorBook = await SolvedQuestions.aggregate([
 			{
 				$match: {
-					student: req.user._id,
+					student: new mongoose.Types.ObjectId(userId),
 					isCorrect: false,
 				},
 			},
@@ -71,7 +72,7 @@ export const getChapterErrorBook = async (req: Request, res: Response, next: Nex
 		const chapterErrorBook = await SolvedQuestions.aggregate([
 			{
 				$match: {
-					student: req.user._id,
+					student: new mongoose.Types.ObjectId(userId),
 					isCorrect: false,
 					'question.chapter': chapterName,
 				},
@@ -93,7 +94,6 @@ export const getChapterErrorBook = async (req: Request, res: Response, next: Nex
 			success: true,
 			chapterErrorBook,
 		});
-		console.log(chapterErrorBook);
 	} catch (error: any) {
 		console.error(error);
 		next(new CustomError(error.message));
