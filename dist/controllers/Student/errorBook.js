@@ -73,6 +73,7 @@ const getChapterErrorBook = async (req, res, next) => {
         const SolvedQuestions = db_1.db.collection('solvedquestions');
         const userId = req.params.id;
         const { chapter } = req.query;
+        console.log(chapter, userId, "here is the data");
         const chapterErrorBook = await SolvedQuestions.aggregate([
             {
                 $match: {

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { db } from '../../db/db';
 import { CustomError } from '../../middlewares/error';
+import mongoose from 'mongoose';
 export const getWeeklyQuiz = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const userId = req.params.id;
@@ -8,7 +9,7 @@ export const getWeeklyQuiz = async (req: Request, res: Response, next: NextFunct
 		const Quiz = db.collection('quizzes');
 
 		let query: any = {
-			user: userId,
+			user: new mongoose.Types.ObjectId(userId),
 			quizType: 'weekly',
 		};
 
