@@ -19,4 +19,5 @@ router.get('/report/overall', checkAuth_1.checkAuth, reports_1.getOverallReport)
 router.get('/errorBook/get/:id', checkAuth_1.checkAuth, errorBook_1.getErrorBook);
 router.get('/errorBook/chapter/get/:id', checkAuth_1.checkAuth, errorBook_1.getChapterErrorBook);
 router.get('/quiz/weeklyQuiz/get/:id', checkAuth_1.checkAuth, quiz_1.getWeeklyQuiz);
+router.get('/quiz/chapter/get/:id', checkAuth_1.checkAuth, quiz_1.getChapterQuiz);
 exports.default = router;

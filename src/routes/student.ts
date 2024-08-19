@@ -8,7 +8,7 @@ import {
 	getWeeklyReport,
 } from '../controllers/Student/reports';
 import { getChapterErrorBook, getErrorBook } from '../controllers/Student/errorBook';
-import { getWeeklyQuiz } from '../controllers/Student/quiz';
+import { getChapterQuiz, getWeeklyQuiz } from '../controllers/Student/quiz';
 
 const router = express.Router();
 
@@ -21,4 +21,5 @@ router.get('/report/overall', checkAuth, getOverallReport);
 router.get('/errorBook/get/:id', checkAuth, getErrorBook);
 router.get('/errorBook/chapter/get/:id', checkAuth, getChapterErrorBook);
 router.get('/quiz/weeklyQuiz/get/:id', checkAuth, getWeeklyQuiz);
+router.get('/quiz/chapter/get/:id', checkAuth, getChapterQuiz);
 export default router;
