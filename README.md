@@ -70,7 +70,7 @@ API documentation for the available endpoints will be available soon. Until then
 
 ## 🤝 Contributing
 
-We welcome contributions to improve the Leadlly Mentor API. To get started, follow our [Contribution Guide](https://github.com/leadlly/leadlly.mentor.api/blob/main/CONTRIBUTING.md).
+We welcome contributions to improve the Leadlly Mentor API! Check our contribution guidelines [here](https://github.com/leadlly/leadlly.mentor.api/blob/main/CONTRIBUTING.md).
 
 ## 📝 License
 
