@@ -64,20 +64,29 @@ export const mentorlInfo = async (
 
     if (bodyData.firstName) updateData.firstname = bodyData.firstName;
     if (bodyData.lastName) updateData.lastname = bodyData.lastName;
-    if (bodyData.dateOfBirth) updateData['about.dateOfBirth'] = bodyData.dateOfBirth;
-    if (bodyData.phone) updateData['phone.personal'] = bodyData.phone;
-    if (bodyData.gender) updateData['about.gender'] = bodyData.gender;
-    if (bodyData.address) updateData['address.addressLine'] = bodyData.address;
-    if (bodyData.pinCode) updateData['address.pincode'] = bodyData.pinCode;
-    if (bodyData.country) updateData['address.country'] = bodyData.country;
-    if (bodyData.schoolOrCollegeName) updateData['academic.schoolOrCollegeName'] = bodyData.schoolOrCollegeName;
-    if (bodyData.schoolOrCollegeAddress) updateData['academic.schoolOrCollegeAddress'] = bodyData.schoolOrCollegeAddress;
-    if (bodyData.degree) updateData['academic.degree'] = bodyData.degree;
-    if (bodyData.gmeet) updateData['gmeet.link'] = bodyData.gmeet;
-    if (bodyData.class) updateData['preference.standard'] = bodyData.class;
-    if (bodyData.competitiveExams) updateData['preference.competitiveExam'] = bodyData.competitiveExams;
+    if (bodyData.dateOfBirth)
+      updateData["about.dateOfBirth"] = bodyData.dateOfBirth;
+    if (bodyData.phone) updateData["phone.personal"] = bodyData.phone;
+    if (bodyData.gender) updateData["about.gender"] = bodyData.gender;
+    if (bodyData.address) updateData["address.addressLine"] = bodyData.address;
+    if (bodyData.pinCode) updateData["address.pincode"] = bodyData.pinCode;
+    if (bodyData.country) updateData["address.country"] = bodyData.country;
+    if (bodyData.schoolOrCollegeName)
+      updateData["academic.schoolOrCollegeName"] = bodyData.schoolOrCollegeName;
+    if (bodyData.schoolOrCollegeAddress)
+      updateData["academic.schoolOrCollegeAddress"] =
+        bodyData.schoolOrCollegeAddress;
+    if (bodyData.degree) updateData["academic.degree"] = bodyData.degree;
+    if (bodyData.gmeet) updateData["gmeet.link"] = bodyData.gmeet;
+    if (bodyData.class) updateData["preference.standard"] = bodyData.class;
+    if (bodyData.competitiveExams)
+      updateData["preference.competitiveExam"] = bodyData.competitiveExams;
 
-    await User.findByIdAndUpdate(req.user._id, { $set: updateData }, { new: true });
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updateData },
+      { new: true }
+    );
 
     res.status(200).json({
       message: "Mentor information updated successfully",
@@ -111,7 +120,9 @@ export const getAllocatedStudents = async (
       }
       return res.status(200).json({ student });
     } else {
-      const studentIds = mentor.students.map((student) => new mongoose.Types.ObjectId(student._id));
+      const studentIds = mentor.students.map(
+        (student) => new mongoose.Types.ObjectId(student._id)
+      );
       if (studentIds.length === 0) {
         return next(new CustomError("No students allocated yet", 404));
       }

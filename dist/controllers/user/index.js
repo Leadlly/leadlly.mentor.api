@@ -55,29 +55,30 @@ const mentorlInfo = async (req, res, next) => {
         if (bodyData.lastName)
             updateData.lastname = bodyData.lastName;
         if (bodyData.dateOfBirth)
-            updateData['about.dateOfBirth'] = bodyData.dateOfBirth;
+            updateData["about.dateOfBirth"] = bodyData.dateOfBirth;
         if (bodyData.phone)
-            updateData['phone.personal'] = bodyData.phone;
+            updateData["phone.personal"] = bodyData.phone;
         if (bodyData.gender)
-            updateData['about.gender'] = bodyData.gender;
+            updateData["about.gender"] = bodyData.gender;
         if (bodyData.address)
-            updateData['address.addressLine'] = bodyData.address;
+            updateData["address.addressLine"] = bodyData.address;
         if (bodyData.pinCode)
-            updateData['address.pincode'] = bodyData.pinCode;
+            updateData["address.pincode"] = bodyData.pinCode;
         if (bodyData.country)
-            updateData['address.country'] = bodyData.country;
+            updateData["address.country"] = bodyData.country;
         if (bodyData.schoolOrCollegeName)
-            updateData['academic.schoolOrCollegeName'] = bodyData.schoolOrCollegeName;
+            updateData["academic.schoolOrCollegeName"] = bodyData.schoolOrCollegeName;
         if (bodyData.schoolOrCollegeAddress)
-            updateData['academic.schoolOrCollegeAddress'] = bodyData.schoolOrCollegeAddress;
+            updateData["academic.schoolOrCollegeAddress"] =
+                bodyData.schoolOrCollegeAddress;
         if (bodyData.degree)
-            updateData['academic.degree'] = bodyData.degree;
+            updateData["academic.degree"] = bodyData.degree;
         if (bodyData.gmeet)
-            updateData['gmeet.link'] = bodyData.gmeet;
+            updateData["gmeet.link"] = bodyData.gmeet;
         if (bodyData.class)
-            updateData['preference.standard'] = bodyData.class;
+            updateData["preference.standard"] = bodyData.class;
         if (bodyData.competitiveExams)
-            updateData['preference.competitiveExam'] = bodyData.competitiveExams;
+            updateData["preference.competitiveExam"] = bodyData.competitiveExams;
         await userModel_1.default.findByIdAndUpdate(req.user._id, { $set: updateData }, { new: true });
         res.status(200).json({
             message: "Mentor information updated successfully",
