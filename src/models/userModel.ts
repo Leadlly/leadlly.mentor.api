@@ -71,7 +71,7 @@ const mentorSchema = new Schema({
     competitiveExam: Array
   },
   students: [{
-    id: {
+    _id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },

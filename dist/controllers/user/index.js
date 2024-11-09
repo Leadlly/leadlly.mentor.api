@@ -107,7 +107,7 @@ const getAllocatedStudents = async (req, res, next) => {
             return res.status(200).json({ student });
         }
         else {
-            const studentIds = mentor.students.map((student) => student.id);
+            const studentIds = mentor.students.map((student) => new mongoose_1.default.Types.ObjectId(student._id));
             if (studentIds.length === 0) {
                 return next(new error_1.CustomError("No students allocated yet", 404));
             }

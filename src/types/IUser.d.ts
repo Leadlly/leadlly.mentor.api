@@ -33,7 +33,7 @@ interface IGMeet {
 }
 
 interface IStudent {
-  id: mongoose.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   gmeet: IGMeet;
 }
 

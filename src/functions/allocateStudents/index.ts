@@ -95,7 +95,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
     const studentIds = students.map(student => student._id);
 
     // Filter out students already assigned to the mentor
-    const existingStudentIds = mentor.students?.map(student => student.id) || [];
+    const existingStudentIds = mentor.students?.map(student => student._id) || [];
     const newStudentIds = studentIds.filter(id => !existingStudentIds.includes(id));
 
     // Calculate how many more students are needed to reach 30
@@ -111,7 +111,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     mentor.students = mentor.students || [];
     mentor.students.push(
-      ...studentsToAdd.map(id => ({ id, gmeet: { tokens: {}, link: null } }))
+      ...studentsToAdd.map(id => ({ _id: id, gmeet: { tokens: {}, link: null } }))
     );
 
     await mentor.save();
