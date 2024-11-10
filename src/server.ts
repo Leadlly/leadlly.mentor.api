@@ -13,7 +13,7 @@ const port = process.env.PORT || 4001
 ConnectToDB()
 
 //event for mentor collection
-watchMentorCollection()
+// watchMentorCollection()
 
 otpWorker
 
