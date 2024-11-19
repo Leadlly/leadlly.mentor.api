@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Notification = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const notificationSchema = new mongoose_1.default.Schema({
-    mentorId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
+    sender: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
     studentId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
     message: { type: String, required: true },
     url: [{ type: String }],

@@ -132,7 +132,7 @@ const createNotification = async (req, res, next) => {
         if (!student)
             return next(new error_1.CustomError("Invalid studnet id", 400));
         const notification = await notificationModel_1.Notification.create({
-            mentorId: req.user._id,
+            sender: req.user._id,
             studentId: student._id,
             message,
             urls
