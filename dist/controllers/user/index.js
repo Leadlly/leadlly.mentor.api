@@ -3,12 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllocatedStudents = exports.mentorlInfo = exports.mentorOauthCallback = exports.mentorOauth = void 0;
+exports.createNotification = exports.getAllocatedStudents = exports.mentorlInfo = exports.mentorOauthCallback = exports.mentorOauth = void 0;
 const getOauth_1 = require("../../services/Google/getOauth");
 const userModel_1 = __importDefault(require("../../models/userModel"));
 const error_1 = require("../../middlewares/error");
 const db_1 = require("../../db/db");
 const mongoose_1 = __importDefault(require("mongoose"));
+const notificationModel_1 = require("../../models/notificationModel");
 const mentorOauth = async (req, res, next) => {
     try {
         const authUrl = getOauth_1.oauth2Client.generateAuthUrl({
@@ -124,3 +125,26 @@ const getAllocatedStudents = async (req, res, next) => {
     }
 };
 exports.getAllocatedStudents = getAllocatedStudents;
+const createNotification = async (req, res, next) => {
+    try {
+        const { message, urls, studentId } = req.body;
+        const student = await db_1.db.collection('users').findOne({ _id: new mongoose_1.default.Types.ObjectId(studentId) });
+        if (!student)
+            return next(new error_1.CustomError("Invalid studnet id", 400));
+        const notification = await notificationModel_1.Notification.create({
+            mentorId: req.user._id,
+            studentId: student._id,
+            message,
+            urls
+        });
+        res.status(201).json({
+            success: true,
+            message: `Notification sent to ${student.firstname}`,
+            notification
+        });
+    }
+    catch (error) {
+        next(new error_1.CustomError(error.message, error.status || 500));
+    }
+};
+exports.createNotification = createNotification;

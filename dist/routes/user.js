@@ -10,4 +10,5 @@ const user_1 = require("../controllers/user");
 const router = express_1.default.Router();
 router.post("/info/save", checkAuth_1.checkAuth, lowercase_1.default, user_1.mentorlInfo);
 router.get("/getstudents", checkAuth_1.checkAuth, user_1.getAllocatedStudents);
+router.post("/create/notification", checkAuth_1.checkAuth, user_1.createNotification);
 exports.default = router;

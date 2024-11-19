@@ -5,6 +5,7 @@ import { CustomError } from "../../middlewares/error";
 import IUser from "../../types/IUser";
 import { db } from "../../db/db";
 import mongoose from "mongoose";
+import { Notification } from "../../models/notificationModel";
 
 export const mentorOauth = async (
   req: Request,
@@ -137,3 +138,28 @@ export const getAllocatedStudents = async (
     next(new CustomError(error.message, error.status || 500));
   }
 };
+
+export const createNotification = async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {message, urls, studentId} = req.body
+
+    const student = await db.collection('users').findOne({ _id: new mongoose.Types.ObjectId(studentId)})
+    if(!student) return next(new CustomError("Invalid studnet id", 400))
+
+    const notification = await Notification.create({
+      mentorId: req.user._id,
+      studentId: student._id,
+      message,
+      urls
+    })
+
+    res.status(201).json({ 
+      success: true,
+      message: `Notification sent to ${student.firstname}`,
+      notification
+    })
+
+  } catch (error: any) {
+    next(new CustomError(error.message, error.status || 500));
+  }
+}
