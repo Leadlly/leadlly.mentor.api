@@ -36,11 +36,12 @@ const auth_1 = __importDefault(require("./routes/auth"));
 const googleAuth_1 = __importDefault(require("./routes/googleAuth"));
 const user_1 = __importDefault(require("./routes/user"));
 const meeting_1 = __importDefault(require("./routes/meeting"));
+const notification_1 = __importDefault(require("./routes/notification"));
 const student_1 = __importDefault(require("./routes/student"));
 const express_winston_1 = __importDefault(require("express-winston"));
 const winston_1 = __importDefault(require("winston"));
 (0, dotenv_1.config)({
-    path: './.env'
+    path: './.env',
 });
 // createMeetLink("Hello")
 const app = (0, express_1.default)();
@@ -56,16 +57,17 @@ app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
 app.use((0, express_1.urlencoded)({ extended: true }));
 app.use((0, cors_1.default)({
-    origin: [process.env.FRONTEND_URL, "http://localhost:3000"],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    origin: [process.env.FRONTEND_URL, 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
 }));
 //routes
 app.use('/api/auth', auth_1.default);
-app.use("/api/google", googleAuth_1.default);
-app.use("/api/user", user_1.default);
-app.use("/api/meeting", meeting_1.default);
-app.use("/api/student", student_1.default);
+app.use('/api/google', googleAuth_1.default);
+app.use('/api/user', user_1.default);
+app.use('/api/meeting', meeting_1.default);
+app.use('/api/student', student_1.default);
+app.use('/api/notification', notification_1.default);
 app.get('/api', (req, res) => {
     res.send('Hello, world!');
 });
