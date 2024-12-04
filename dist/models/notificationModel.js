@@ -11,6 +11,7 @@ const notificationSchema = new mongoose_1.default.Schema({
     message: { type: String, required: true },
     url: [{ type: String }],
     isRead: { type: Boolean, default: false },
+    option: { type: String },
     createdAt: { type: Date, default: Date.now },
 });
 exports.Notification = mongoose_1.default.model('Notification', notificationSchema);
