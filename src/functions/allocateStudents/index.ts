@@ -70,7 +70,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
     }).filter((query): query is StudentQuery => query !== null);
 
     let students = await Student.find({
-      'mentor.id': null,
+      'mentor._id': null,
       $or: queries
     }).limit(30).toArray();
 
@@ -118,7 +118,7 @@ export const allocateStudentsToMentor = async (mentorId: string) => {
 
     await Student.updateMany(
       { _id: { $in: studentsToAdd } },
-      { $set: { 'mentor.id': new mongoose.Types.ObjectId(mentor._id) } }
+      { $set: { 'mentor._id': new mongoose.Types.ObjectId(mentor._id) } }
     );
 
     console.log('Students allocated to mentor successfully');

@@ -103,7 +103,6 @@ const getMeetings = async (req, res, next) => {
         const { studentId, meeting, createdBy, allMeetings } = req.query;
         // Convert mentorId to ObjectId
         const mentorObjectId = new mongoose_1.default.Types.ObjectId(mentorId);
-        console.log(allMeetings, createdBy, meeting, studentId, !createdBy && !meeting && allMeetings === 'true' && studentId ? true : false);
         // Initialize a query object
         let query = {
             mentor: mentorObjectId,

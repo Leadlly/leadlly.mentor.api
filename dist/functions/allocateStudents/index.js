@@ -61,7 +61,7 @@ const allocateStudentsToMentor = async (mentorId) => {
             return null;
         }).filter((query) => query !== null);
         let students = await Student.find({
-            'mentor.id': null,
+            'mentor._id': null,
             $or: queries
         }).limit(30).toArray();
         if (students.length === 0) {
@@ -97,7 +97,7 @@ const allocateStudentsToMentor = async (mentorId) => {
         mentor.students = mentor.students || [];
         mentor.students.push(...studentsToAdd.map(id => ({ _id: id, gmeet: { tokens: {}, link: null } })));
         await mentor.save();
-        await Student.updateMany({ _id: { $in: studentsToAdd } }, { $set: { 'mentor.id': new mongoose_1.default.Types.ObjectId(mentor._id) } });
+        await Student.updateMany({ _id: { $in: studentsToAdd } }, { $set: { 'mentor._id': new mongoose_1.default.Types.ObjectId(mentor._id) } });
         console.log('Students allocated to mentor successfully');
     }
     catch (error) {
